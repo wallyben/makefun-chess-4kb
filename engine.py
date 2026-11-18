@@ -77,7 +77,12 @@ def search(b,w,c,e,d,alpha=-999999,beta=999999):
  ms.sort(key=lambda m:V.get(b[m[1]].lower(),0)+800*bool(m[2]),reverse=True)
  best=None
  for m in ms:
-  v=-search(apply(b,m,e),not w,'-','-',d-1,-beta,-alpha)[0]
+  i,j,_=m;piece=b[i];nc=c;ne='-'
+  if piece.lower()=='k':nc=nc.replace('K' if w else 'k','').replace('Q' if w else 'q','')
+  for square,right in ((63,'K'),(56,'Q'),(7,'k'),(0,'q')):
+   if i==square or j==square:nc=nc.replace(right,'')
+  if piece.lower()=='p' and abs(i-j)==16:ne=nm((i+j)//2)
+  v=-search(apply(b,m,e),not w,nc,ne,d-1,-beta,-alpha)[0]
   if v>alpha:alpha=v;best=m
   if alpha>=beta:break
  return alpha,best
