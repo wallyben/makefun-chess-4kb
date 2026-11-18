@@ -38,4 +38,21 @@ class EngineTests(unittest.TestCase):
  def test_search_legal(self):
   b,w,c,e=parse(START);_,m=search(b,True,c,e,2)
   self.assertIn(m,moves(b,True,c,e))
+ def test_king_cannot_be_captured(self):
+  b,w,c,e=parse('4k3/8/8/8/8/8/4R3/4K3 w - - 0 1')
+  self.assertNotIn('e2e8',[nm(i)+nm(j) for i,j,_ in moves(b,True,c,e)])
+ def test_pawn_cannot_capture_king(self):
+  b,w,c,e=parse('8/8/8/8/4k3/3P4/8/4K3 w - - 0 1')
+  self.assertNotIn('d3e4',[nm(i)+nm(j) for i,j,_ in moves(b,True,c,e)])
+ def test_pinned_rook_cannot_leave_file(self):
+  b,w,c,e=parse('4r2k/8/8/8/8/8/4R3/4K3 w - - 0 1')
+  self.assertNotIn('e2d2',[nm(i)+nm(j) for i,j,_ in moves(b,True,c,e)])
+ def test_checkmate_no_move(self):
+  b,w,c,e=parse('7k/6Q1/5K2/8/8/8/8/8 b - - 0 1')
+  self.assertEqual(moves(b,False,c,e),[])
+  self.assertIsNone(search(b,False,c,e,2)[1])
+ def test_stalemate_no_move(self):
+  b,w,c,e=parse('7k/5K2/6Q1/8/8/8/8/8 b - - 0 1')
+  self.assertEqual(moves(b,False,c,e),[])
+  self.assertEqual(search(b,False,c,e,2)[0],0)
 if __name__=='__main__':unittest.main()
