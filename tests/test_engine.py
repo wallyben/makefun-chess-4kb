@@ -24,6 +24,17 @@ class EngineTests(unittest.TestCase):
  def test_promotion(self):
   b,w,c,e=parse('4k3/P7/8/8/8/8/8/4K3 w - - 0 1')
   self.assertEqual(len([m for m in moves(b,True,c,e) if nm(m[0])+nm(m[1])=='a7a8']),4)
+ def test_castling_rights_after_rook_capture(self):
+  b,w,c,e=parse('r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1')
+  # The search must not invent a rook when a castling rook has been captured.
+  _,m=search(b,True,c,e,2)
+  self.assertIn(m,moves(b,True,c,e))
+ def test_en_passant_only_on_immediate_reply(self):
+  b,w,c,e=parse('4k3/8/8/3p4/8/8/4P3/4K3 w - - 0 1')
+  m=next(m for m in moves(b,True,c,e) if nm(m[0])+nm(m[1])=='e2e4')
+  n=apply(b,m,e)
+  self.assertIn('d5e4',[nm(i)+nm(j) for i,j,_ in moves(n,False,'-',nm((m[0]+m[1])//2))])
+  self.assertNotIn('d5e4',[nm(i)+nm(j) for i,j,_ in moves(n,False,'-','-')])
  def test_search_legal(self):
   b,w,c,e=parse(START);_,m=search(b,True,c,e,2)
   self.assertIn(m,moves(b,True,c,e))
