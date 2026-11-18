@@ -29,7 +29,7 @@ def king(b,w):
 def moves(b,w,castle='-',ep='-',legal=True):
  out=[]
  def add(i,j,p=''):
-  if b[j]=='.' or b[j].isupper()!=w:out.append((i,j,p))
+  if b[j]=='.' or b[j].lower()!='k' and b[j].isupper()!=w:out.append((i,j,p))
  for i,c in enumerate(b):
   if c=='.' or c.isupper()!=w:continue
   x,y=i%8,i//8;t=c.lower()
@@ -43,7 +43,7 @@ def moves(b,w,castle='-',ep='-',legal=True):
     for dx in (-1,1):
      if 0<=x+dx<8:
       j=ny*8+x+dx
-      if b[j]!='.' and b[j].isupper()!=w or ep!='-' and j==sq(ep):
+      if b[j]!='.' and b[j].lower()!='k' and b[j].isupper()!=w or ep!='-' and j==sq(ep) and b[j]=='.':
        for p in ('q','r','b','n') if ny in (0,7) else ('',):add(i,j,p)
   elif t=='n':
    for dx,dy in ((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)):
