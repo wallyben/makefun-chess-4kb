@@ -55,4 +55,10 @@ class EngineTests(unittest.TestCase):
   b,w,c,e=parse('7k/5K2/6Q1/8/8/8/8/8 b - - 0 1')
   self.assertEqual(moves(b,False,c,e),[])
   self.assertEqual(search(b,False,c,e,2)[0],0)
+ def test_en_passant_requires_captured_pawn(self):
+  b,w,c,e=parse('4k3/8/8/4P3/8/8/8/4K3 w - d6 0 1')
+  self.assertNotIn('e5d6',[nm(i)+nm(j) for i,j,_ in moves(b,True,c,e)])
+ def test_en_passant_requires_captured_white_pawn(self):
+  b,w,c,e=parse('4k3/8/8/8/4p3/8/8/4K3 b - d3 0 1')
+  self.assertNotIn('e4d3',[nm(i)+nm(j) for i,j,_ in moves(b,False,c,e)])
 if __name__=='__main__':unittest.main()
