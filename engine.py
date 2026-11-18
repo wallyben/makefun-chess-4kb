@@ -43,7 +43,7 @@ def moves(b,w,castle='-',ep='-',legal=True):
     for dx in (-1,1):
      if 0<=x+dx<8:
       j=ny*8+x+dx
-      if b[j]!='.' and b[j].lower()!='k' and b[j].isupper()!=w or ep!='-' and j==sq(ep) and b[j]=='.':
+      if (b[j]!='.' and b[j].lower()!='k' and b[j].isupper()!=w) or (ep!='-' and j==sq(ep) and b[j]=='.' and b[j+(8 if w else -8)]==('p' if w else 'P')):
        for p in ('q','r','b','n') if ny in (0,7) else ('',):add(i,j,p)
   elif t=='n':
    for dx,dy in ((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)):
