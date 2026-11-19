@@ -81,6 +81,8 @@ def search(b,w,c,e,d,alpha=-999999,beta=999999,q=0):
  check=attacked(b,king(b,w),not w)
  if d<=0 and not check:
   stand=sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.')
+  # Terminal stalemate must score zero even at a quiescence cutoff.
+  if not moves(b,w,c,e):return 0,None
   if q>=4 or stand>=beta:return stand,None
   alpha=max(alpha,stand)
  ms=moves(b,w,c,e)
