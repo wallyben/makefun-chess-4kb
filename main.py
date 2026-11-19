@@ -35,6 +35,10 @@ def attacks(b,w):
 def score(b,w):
  own=attacks(b,w);opp=attacks(b,not w);v=0
  for i,p in enumerate(b):
+  if p=='K' or p=='k':
+   friendly=p.isupper()==w
+   if i in (opp if friendly else own):v+=-120 if friendly else 120
+ for i,p in enumerate(b):
   if p=='.':continue
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   center=6-abs(2*x-7)//2-abs(2*y-7)//2
