@@ -71,9 +71,10 @@ def attacked(b,j,w):
   if 0<=nx<8 and 0<=ny<8 and b[ny*8+nx]==('P' if w else 'p'):return True
  return any(k==j and b[i].lower()!='p' for i,k,_ in moves(b,w,legal=False))
 def search(b,w,c,e,d,alpha=-999999,beta=999999):
+ if d==0:
+  return sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.'),None
  ms=moves(b,w,c,e)
  if not ms:return (-100000-d if attacked(b,king(b,w),not w) else 0),None
- if d==0:return sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.'),None
  ms.sort(key=lambda m:V.get(b[m[1]].lower(),0)+800*bool(m[2]),reverse=True)
  best=None
  for m in ms:
