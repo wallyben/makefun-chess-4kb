@@ -92,7 +92,7 @@ def search(b,w,c,e,d,alpha=-999999,beta=999999,q=0):
   elif q>=6:
    # Bounded check extension: evaluate legal evasions instead of inventing mate.
    return max((-sum(V[p.lower()]*(1 if p.isupper()==w else -1) for p in apply(b,m,e) if p!='.') for m in ms)),None
- ms.sort(key=lambda m:V.get(b[m[1]].lower(),0)+800*bool(m[2]),reverse=True)
+ ms.sort(key=lambda m:10*V.get(b[m[1]].lower(),0)-V[b[m[0]].lower()]+8000*bool(m[2])+(1000 if b[m[0]].lower()=='p' and e!='-' and m[1]==sq(e) else 0),reverse=True)
  best=None
  for m in ms:
   i,j,_=m;piece=b[i];nc=c;ne='-'
