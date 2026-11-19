@@ -34,6 +34,10 @@ class EngineTests(unittest.TestCase):
   m=next(m for m in moves(b,True,c,e) if nm(m[0])+nm(m[1])=='e2e4')
   n=apply(b,m,e)
   self.assertIn('d5e4',[nm(i)+nm(j) for i,j,_ in moves(n,False,'-',nm((m[0]+m[1])//2))])
+  # With the pawn still on e4, d5e4 is an ordinary legal capture.
+  self.assertIn('d5e4',[nm(i)+nm(j) for i,j,_ in moves(n,False,'-','-')])
+  # Remove that pawn to isolate the expired en-passant right.
+  n[sq('e4')]='.'
   self.assertNotIn('d5e4',[nm(i)+nm(j) for i,j,_ in moves(n,False,'-','-')])
  def test_search_legal(self):
   b,w,c,e=parse(START);_,m=search(b,True,c,e,2)
