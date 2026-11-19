@@ -71,11 +71,19 @@ def attacked(b,j,w):
   if 0<=nx<8 and 0<=ny<8 and b[ny*8+nx]==('P' if w else 'p'):return True
  t=b[:];t[j]='.'
  return any(k==j and t[i].lower()!='p' for i,k,_ in moves(t,w,legal=False))
-def search(b,w,c,e,d,alpha=-999999,beta=999999):
- if d==0:
-  return sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.'),None
+def search(b,w,c,e,d,alpha=-999999,beta=999999,q=0):
+ # Quiescence: resolve forcing captures and promotions at the horizon.
+ # In check, search every evasion; stand-pat is not legal.
+ check=attacked(b,king(b,w),not w)
+ if d<=0 and not check:
+  stand=sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.')
+  if q>=4 or stand>=beta:return stand,None
+  alpha=max(alpha,stand)
  ms=moves(b,w,c,e)
- if not ms:return (-100000-d if attacked(b,king(b,w),not w) else 0),None
+ if not ms:return (-100000-d if check else 0),None
+ if d<=0:
+  if not check:ms=[m for m in ms if b[m[1]]!='.' or m[2] or (b[m[0]].lower()=='p' and e!='-' and m[1]==sq(e))]
+  elif q>=6:return -90000,None
  ms.sort(key=lambda m:V.get(b[m[1]].lower(),0)+800*bool(m[2]),reverse=True)
  best=None
  for m in ms:
@@ -84,7 +92,7 @@ def search(b,w,c,e,d,alpha=-999999,beta=999999):
   for square,right in ((63,'K'),(56,'Q'),(7,'k'),(0,'q')):
    if i==square or j==square:nc=nc.replace(right,'')
   if piece.lower()=='p' and abs(i-j)==16:ne=nm((i+j)//2)
-  v=-search(apply(b,m,e),not w,nc,ne,d-1,-beta,-alpha)[0]
+  v=-search(apply(b,m,e),not w,nc,ne,d-1,-beta,-alpha,q+1 if d<=0 else 0)[0]
   if v>alpha:alpha=v;best=m
   if alpha>=beta:break
  return alpha,best
