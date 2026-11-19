@@ -69,7 +69,8 @@ def attacked(b,j,w):
  for dx in (-1,1):
   nx=x+dx;ny=y+(1 if w else -1)
   if 0<=nx<8 and 0<=ny<8 and b[ny*8+nx]==('P' if w else 'p'):return True
- return any(k==j and b[i].lower()!='p' for i,k,_ in moves(b,w,legal=False))
+ t=b[:];t[j]='.'
+ return any(k==j and t[i].lower()!='p' for i,k,_ in moves(t,w,legal=False))
 def search(b,w,c,e,d,alpha=-999999,beta=999999):
  if d==0:
   return sum((V[p.lower()]+(10 if p.lower()=='p' and 2<i//8<6 else 0))*(1 if p.isupper()==w else -1) for i,p in enumerate(b) if p!='.'),None
