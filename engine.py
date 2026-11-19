@@ -62,7 +62,11 @@ def moves(b,w,castle='-',ep='-',legal=True):
      for right,rook,dest,clear,transit in ((rights[0],7,6,(5,6),5),(rights[1],0,2,(1,2,3),3)):
       if right in castle and b[rank*8+rook]==('R' if w else 'r') and all(b[rank*8+z]=='.' for z in clear) and not attacked(b,rank*8+transit,not w):out.append((i,rank*8+dest,''))
  if not legal:return out
- return [m for m in out if not attacked(apply(b,m,ep),king(apply(b,m,ep),w),not w)]
+ legal_moves=[]
+ for m in out:
+  n=apply(b,m,ep)
+  if not attacked(n,king(n,w),not w):legal_moves.append(m)
+ return legal_moves
 def attacked(b,j,w):
  if j<0:return True
  x,y=j%8,j//8
