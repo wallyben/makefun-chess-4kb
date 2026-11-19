@@ -83,7 +83,9 @@ def search(b,w,c,e,d,alpha=-999999,beta=999999,q=0):
  if not ms:return (-100000-d if check else 0),None
  if d<=0:
   if not check:ms=[m for m in ms if b[m[1]]!='.' or m[2] or (b[m[0]].lower()=='p' and e!='-' and m[1]==sq(e))]
-  elif q>=6:return -90000,None
+  elif q>=6:
+   # Bounded check extension: evaluate legal evasions instead of inventing mate.
+   return max((-sum(V[p.lower()]*(1 if p.isupper()==w else -1) for p in apply(b,m,e) if p!='.') for m in ms)),None
  ms.sort(key=lambda m:V.get(b[m[1]].lower(),0)+800*bool(m[2]),reverse=True)
  best=None
  for m in ms:
