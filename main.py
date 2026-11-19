@@ -43,7 +43,7 @@ def score(b,w):
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   center=6-abs(2*x-7)//2-abs(2*y-7)//2
   bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else center*3 if t in 'rq' else 0)
-  if i in (opp if friendly else own) and i not in (own if friendly else opp):bonus-=V[t]//3
+  if i in (opp if friendly else own) and i not in (own if friendly else opp):bonus-=V[t]*9//10
   v+=(V[t]+bonus)*(1 if friendly else -1)
  return v
 def main():
