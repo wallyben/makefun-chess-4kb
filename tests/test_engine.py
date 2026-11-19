@@ -42,6 +42,10 @@ class EngineTests(unittest.TestCase):
  def test_search_legal(self):
   b,w,c,e=parse(START);_,m=search(b,True,c,e,2)
   self.assertIn(m,moves(b,True,c,e))
+ def test_search_returns_legal_move_with_closed_alpha_window(self):
+  b,w,c,e=parse(START)
+  _,m=search(b,True,c,e,1,alpha=999999,beta=1000000)
+  self.assertIn(m,moves(b,True,c,e))
  def test_king_cannot_be_captured(self):
   b,w,c,e=parse('4k3/8/8/8/8/8/4R3/4K3 w - - 0 1')
   self.assertNotIn('e2e8',[nm(i)+nm(j) for i,j,_ in moves(b,True,c,e)])
