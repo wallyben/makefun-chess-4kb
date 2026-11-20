@@ -32,5 +32,17 @@ jobs:
           assert len(list(main.replies(b,False)))==20
           assert main.move(b,'e2e4')[main.sq('e4')]=='P'
           assert main.move(b,'e2e4')[main.sq('e2')]=='.'
+          # Pawn legality: no diagonal non-captures or forward captures.
+          empty='4k3/8/8/8/8/8/4P3/4K3 w - - 0 1'
+          b=main.board(empty)
+          dest={i for n in main.replies(b,True) for i in range(64) if n[i]=='P' and b[i]!='P'}
+          assert dest=={main.sq('e3'),main.sq('e4')},dest
+          blocked='4k3/8/8/8/8/4p3/4P3/4K3 w - - 0 1'
+          b=main.board(blocked)
+          assert not any(n[main.sq('e3')]=='P' for n in main.replies(b,True))
+          capture='4k3/8/8/8/8/3p4/4P3/4K3 w - - 0 1'
+          b=main.board(capture)
+          assert any(n[main.sq('d3')]=='P' for n in main.replies(b,True))
+          assert not any(n[main.sq('f3')]=='P' for n in main.replies(b,True))
           print('Candidate smoke checks passed')
           PY
