@@ -80,7 +80,8 @@ def main():
    def value(m):
     n=move(b,m);e=-1
     if b[sq(m[:2])].lower()=='p' and abs(sq(m[:2])-sq(m[2:4]))==16:e=(sq(m[:2])+sq(m[2:4]))//2
-    return min((score(r,w) for r in replies(n,not w,e)),default=score(n,w))
+    a=min((score(r,w) for r in replies(n,not w,e)),default=None)
+    return a if a is not None else (100000 if ('k' if w else 'K') in n and n.index('k' if w else 'K') in attacks(n,w) else 0)
    m=max(sorted(legal),key=value)
    s=post('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
