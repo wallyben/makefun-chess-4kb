@@ -61,7 +61,7 @@ def replies(b,w,ep=-1):
    xx,yy=x+dx,y+dy
    while 0<=xx<8 and 0<=yy<8:
     j=yy*8+xx;q=b[j]
-    if q=='.' or q.isupper()!=w:
+    if (q=='.' or q.isupper()!=w) and (t!='p' or (dx==0 and q=='.') or (dx!=0 and (q!='.' or j==ep))):
      if q.lower()!='k':
       n=b[:];n[i]='.';n[j]=p
       if t=='p' and j==ep and q=='.':n[j+(8 if w else -8)]='.'
