@@ -46,6 +46,29 @@ def score(b,w):
   if i in (opp if friendly else own) and i not in (own if friendly else opp):bonus-=V[t]*9//10
   v+=(V[t]+bonus)*(1 if friendly else -1)
  return v
+def replies(b,w,ep=-1):
+ for i,p in enumerate(b):
+  if p=='.' or p.isupper()!=w:continue
+  t=p.lower();x=i%8;y=i//8
+  if t=='p':
+   d=-1 if w else 1
+   steps=[(0,d)] if 0<=y+d<8 and b[i+8*d]=='.' else []
+   if steps and y==(6 if w else 1) and b[i+16*d]=='.':steps.append((0,2*d))
+   steps += [(dx,d) for dx in (-1,1) if 0<=x+dx<8 and 0<=y+d<8 and ((b[i+8*d+dx]!='.' and b[i+8*d+dx].isupper()!=w) or i+8*d+dx==ep)]
+  elif t=='n':steps=[(1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)]
+  else:steps=([(1,1),(-1,1),(1,-1),(-1,-1)] if t=='b' else [(1,0),(-1,0),(0,1),(0,-1)] if t=='r' else [(1,1),(-1,1),(1,-1),(-1,-1),(1,0),(-1,0),(0,1),(0,-1)])
+  for dx,dy in steps:
+   xx,yy=x+dx,y+dy
+   while 0<=xx<8 and 0<=yy<8:
+    j=yy*8+xx;q=b[j]
+    if q=='.' or q.isupper()!=w:
+     if q.lower()!='k':
+      n=b[:];n[i]='.';n[j]=p
+      if t=='p' and j==ep and q=='.':n[j+(8 if w else -8)]='.'
+      if t=='p' and yy==(0 if w else 7):n[j]='Q' if w else 'q'
+      if n.index('K' if w else 'k') not in attacks(n,not w):yield n
+    if q!='.' or t in 'pnk':break
+    xx+=dx;yy+=dy
 def main():
  while True:
   s=post('/game',{})
@@ -54,6 +77,10 @@ def main():
    legal=s['legal_moves']
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w'
-   m=max(sorted(legal),key=lambda m:score(move(b,m),w))
+   def value(m):
+    n=move(b,m);e=-1
+    if b[sq(m[:2])].lower()=='p' and abs(sq(m[:2])-sq(m[2:4]))==16:e=(sq(m[:2])+sq(m[2:4]))//2
+    return min((score(r,w) for r in replies(n,not w,e)),default=score(n,w))
+   m=max(sorted(legal),key=value)
    s=post('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
