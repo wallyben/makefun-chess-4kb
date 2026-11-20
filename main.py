@@ -77,11 +77,15 @@ def main():
    legal=s['legal_moves']
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w'
-   def value(m):
-    n=move(b,m);e=-1
-    if b[sq(m[:2])].lower()=='p' and abs(sq(m[:2])-sq(m[2:4]))==16:e=(sq(m[:2])+sq(m[2:4]))//2
-    a=min((score(r,w) for r in replies(n,not w,e)),default=None)
-    return a if a is not None else (100000 if ('k' if w else 'K') in n and n.index('k' if w else 'K') in attacks(n,w) else 0)
-   m=max(sorted(legal),key=value)
+   best=-10**9;m=sorted(legal)[0]
+   for q in sorted(legal):
+    n=move(b,q);e=-1
+    if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
+    a=None
+    for r in replies(n,not w,e):
+     z=score(r,w);a=z if a is None else min(a,z)
+     if a<=best:break
+    if a is None:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
+    if a>best:best=a;m=q
    s=post('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
