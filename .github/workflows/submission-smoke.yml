@@ -1,0 +1,36 @@
+name: Submission candidate smoke test
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: submission-minimal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate candidate size, syntax and chess invariants
+        run: |
+          python - <<'PY'
+          import pathlib,ast,os
+          p=pathlib.Path('main.py')
+          assert p.stat().st_size<=4096,p.stat().st_size
+          files=[f for f in pathlib.Path('.').rglob('*') if f.is_file() and '.git' not in f.parts]
+          assert sum(f.stat().st_size for f in files)<=8192
+          assert all(f.stat().st_size<=4096 for f in files)
+          ast.parse(p.read_text())
+          os.environ['MAKEFUN_ENV_URL']='http://127.0.0.1:1'
+          import main
+          start='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+          b=main.board(start)
+          assert len(b)==64
+          assert len(list(main.replies(b,True)))==20
+          assert len(list(main.replies(b,False)))==20
+          assert main.move(b,'e2e4')[main.sq('e4')]=='P'
+          assert main.move(b,'e2e4')[main.sq('e2')]=='.'
+          print('Candidate smoke checks passed')
+          PY
