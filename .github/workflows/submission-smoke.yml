@@ -57,7 +57,9 @@ jobs:
               def do_POST(self):
                   length=int(self.headers.get('Content-Length','0'))
                   data=json.loads(self.rfile.read(length))
-                  if self.path=='/game':
+                  if self.path=='/game' and moves:
+                      payload={'status':'done'}
+                  elif self.path=='/game':
                       payload={'status':'your_move','game':'smoke','fen':'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1','legal_moves':['e2e4','d2d4','g1f3']}
                   elif self.path=='/move':
                       moves.append(data)
