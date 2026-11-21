@@ -30,6 +30,12 @@ jobs:
           assert len(b)==64
           assert len(list(main.replies(b,True)))==20
           assert len(list(main.replies(b,False)))==20
+          # Independent depth-two starting-position perft (no castling or EP at depth 2).
+          # Every first move must leave exactly 20 legal opponent replies: 400 nodes.
+          assert sum(len(list(main.replies(n,False))) for n in main.replies(b,True))==400
+          # Fixed-depth move generation must be reproducible on identical input.
+          first=[tuple(n) for n in main.replies(b,True)]
+          assert first==[tuple(n) for n in main.replies(b,True)]
           assert main.move(b,'e2e4')[main.sq('e4')]=='P'
           assert main.move(b,'e2e4')[main.sq('e2')]=='.'
           # Pawn legality: no diagonal non-captures or forward captures.
