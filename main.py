@@ -68,7 +68,7 @@ def replies(b,w,ep=-1):
 def search(b,w,us,d,lo,hi):
  global nodes
  nodes+=1
- if nodes>3000:raise TimeoutError
+ if nodes>12000:raise TimeoutError
  if not d:return score(b,us)
  found=0
  for n in replies(b,w):
@@ -88,13 +88,13 @@ def main():
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
    nodes=0
-   for depth in (1,2):
-    best=-99999;chosen=m
+   for depth in (1,2,3):
+    best=-9999;chosen=m
     try:
      for q in sorted(legal):
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
-      a=1000000;found=0
+      a=99999;found=0
       for r in replies(n,not w,e):
        found=1;a=min(a,search(r,w,w,depth-1,best,a))
        if a<=best:break
