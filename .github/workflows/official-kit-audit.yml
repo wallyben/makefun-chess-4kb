@@ -18,9 +18,14 @@ jobs:
           mkdir -p /tmp/tiny-kit
           tar -xzf /tmp/tiny-kit.tar.gz -C /tmp/tiny-kit
           find /tmp/tiny-kit -type f | sort > official-kit-files.txt
-          find /tmp/tiny-kit -path '*/agent/sunfish-4k/main.py' -print > official-house-path.txt
+          echo 'OFFICIAL KIT CONTENTS:'
+          cat official-kit-files.txt
+          find /tmp/tiny-kit -type f \( -iname '*sunfish*' -o -name 'main.py' \) -print > official-house-path.txt
           HOUSE="$(head -1 official-house-path.txt)"
-          test -n "$HOUSE" && test -f "$HOUSE"
+          if [ -z "$HOUSE" ] || [ ! -f "$HOUSE" ]; then
+            echo 'BLOCK: kit extracted but no Sunfish/main.py candidate found; inspect official-kit-files.txt artifact'
+            exit 2
+          fi
           cp "$HOUSE" official-house-main.py
           python - <<'PY'
           import pathlib,ast,hashlib,json
