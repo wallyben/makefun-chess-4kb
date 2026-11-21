@@ -81,6 +81,18 @@ def main():
                 n=b.copy();n.push(m)
                 expected.add("".join(candidate.board(n.fen())))
             assert actual==expected,(game,ply,b.fen(),len(actual),len(expected),len(actual^expected))
+    # Regression for a pinned en-passant capture: it must not expose the king.
+    pinned_ep="4r1k1/8/8/3pP3/8/8/8/4K3 w - d6 0 1"
+    pinned=chess.Board(pinned_ep)
+    assert chess.Move.from_uci("e5d6") not in pinned.legal_moves
+    ep=candidate.sq("d6")
+    generated={"".join(x) for x in candidate.replies(candidate.board(pinned_ep),True,ep)}
+    assert generated=={"".join(candidate.board((lambda x:x)(pinned.copy(stack=False)).fen()))} if False else True
+    expected=set()
+    for m in pinned.legal_moves:
+        nxt=pinned.copy();nxt.push(m)
+        expected.add("".join(candidate.board(nxt.fen())))
+    assert generated==expected,("pinned en-passant",generated^expected)
     # A candidate must never claim a checkmated position has legal evasions.
     for fen in [
         "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1",
