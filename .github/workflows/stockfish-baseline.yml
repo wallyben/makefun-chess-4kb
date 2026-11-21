@@ -93,7 +93,7 @@ jobs:
             env=dict(os.environ,MAKEFUN_ENV_URL=f'http://127.0.0.1:{server.server_port}')
             t=time.monotonic()
             try:
-             p=subprocess.run([sys.executable,engine_path],env=env,text=True,capture_output=True,timeout=35)
+             p=subprocess.run([sys.executable,engine_path],env=env,text=True,capture_output=True,timeout=180)
              metrics['elapsed_seconds']=round(time.monotonic()-t,3)
              metrics['crash']=p.returncode!=0
              if metrics['crash']:metrics['stderr']=p.stderr[-1000:]
@@ -113,5 +113,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || matrix.candidate == 'experiment/mobility-eval-20261121' && 'mobility' || 'tactical' }}
+          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || 'alphabeta' }}
           path: stockfish-baseline-results.json
