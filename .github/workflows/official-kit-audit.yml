@@ -27,6 +27,14 @@ jobs:
             exit 2
           fi
           cp "$HOUSE" official-house-main.py
+          cp /tmp/tiny-kit/tiny-chess-01-kit/RULES.txt official-RULES.txt
+          cp /tmp/tiny-kit/tiny-chess-01-kit/program/generator/calibration.json official-calibration.json
+          cp /tmp/tiny-kit/tiny-chess-01-kit/program/scorer/score.mjs official-score.mjs
+          cp /tmp/tiny-kit/tiny-chess-01-kit/program/env/server.mjs official-server.mjs
+          cp /tmp/tiny-kit/tiny-chess-01-kit/kit.json official-kit.json
+          tar tzf /tmp/tiny-kit/tiny-chess-01-kit/harness/harness-src.tar.gz > official-harness-files.txt
+          echo 'NESTED HARNESS FILES:'
+          cat official-harness-files.txt
           python - <<'PY'
           import pathlib,ast,hashlib,json
           p=pathlib.Path('official-house-main.py')
@@ -34,7 +42,7 @@ jobs:
           print('house_main_bytes',len(data),'sha256',hashlib.sha256(data).hexdigest())
           assert len(data)<=4096
           ast.parse(data.decode())
-          print('Official house source parsed; runtime and licensing still require independent validation')
+          print('STARTER ONLY parsed; no Sunfish house engine exists in outer kit. Inspect nested harness separately.')
           PY
           grep -Ei 'RULES.txt|kit.json|agent/sunfish-4k|generator|calibration|practice|protocol|scorer' official-kit-files.txt | head -150
       - uses: actions/upload-artifact@v4
@@ -45,3 +53,9 @@ jobs:
             official-kit-files.txt
             official-house-path.txt
             official-house-main.py
+            official-RULES.txt
+            official-calibration.json
+            official-score.mjs
+            official-server.mjs
+            official-kit.json
+            official-harness-files.txt
