@@ -1,0 +1,55 @@
+name: Official scoring and protocol evidence
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/official-scoring-evidence.yml'
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract and inspect authoritative competition components
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://make.fun/c/tiny-chess-01/kit -o /tmp/tiny-kit.tar.gz
+          mkdir -p /tmp/tiny-kit
+          tar -xzf /tmp/tiny-kit.tar.gz -C /tmp/tiny-kit
+          K=/tmp/tiny-kit/tiny-chess-01-kit
+          cp "$K/RULES.txt" official-rules.txt
+          cp "$K/program/scorer/score.mjs" official-score.mjs
+          cp "$K/program/generator/calibration.json" official-calibration.json
+          cp "$K/program/env/server.mjs" official-server.mjs
+          cp "$K/competition.yaml" official-competition.yaml
+          cp "$K/kit.json" official-kit.json
+          cp "$K/practice/trial-0/input/env/gauntlet.json" official-practice-gauntlet.json
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          for name in ['official-rules.txt','official-score.mjs','official-server.mjs','official-competition.yaml','official-kit.json']:
+           s=Path(name).read_text()
+           print('\n===== '+name+' ('+str(len(s.encode()))+' bytes) =====')
+           if len(s)<15000:print(s)
+           else:
+            lines=s.splitlines()
+            for i,line in enumerate(lines):
+             if re.search(r'elo|sunfish|house|opening|gauntlet|depth|node|seed|score|move|deadline|time|license|licence|transcript',line,re.I):
+              print(str(i+1)+': '+line[:250])
+          for name in ['official-calibration.json','official-practice-gauntlet.json']:
+           d=json.loads(Path(name).read_text())
+           print('\n===== '+name+' =====')
+           print(json.dumps(d,indent=2)[:14000])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-scoring-evidence
+          path: |
+            official-rules.txt
+            official-score.mjs
+            official-calibration.json
+            official-server.mjs
+            official-competition.yaml
+            official-kit.json
+            official-practice-gauntlet.json
