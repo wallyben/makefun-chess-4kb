@@ -11,7 +11,7 @@ import chess
 import chess.engine
 
 SEED = 20261121
-SAMPLES = 120
+SAMPLES = 160
 DEPTH = 9
 COEFFICIENTS = (-8, -4, -2, 0, 1, 2, 4, 8, 12, 16)
 PIECE_VALUES = {chess.PAWN:100, chess.KNIGHT:320, chess.BISHOP:330,
@@ -23,30 +23,37 @@ def material(board):
                for piece in board.piece_map().values())
 
 
-def mobility(board):
-    white = board.copy(stack=False)
-    black = board.copy(stack=False)
-    white.turn = chess.WHITE
-    black.turn = chess.BLACK
-    return len(white.attacks(chess.E4)) - len(black.attacks(chess.E4))
-
-
 def controlled_squares(board):
-    return sum(any(board.is_attacked_by(chess.WHITE, s) for s in [i]) -
-               any(board.is_attacked_by(chess.BLACK, s) for s in [i])
-               for i in chess.SQUARES)
+    return sum(int(board.is_attacked_by(chess.WHITE, s)) -
+               int(board.is_attacked_by(chess.BLACK, s)) for s in chess.SQUARES)
+
+
+OPENINGS = (
+    ('e2e4','e7e5','g1f3','b8c6'),
+    ('d2d4','d7d5','c2c4','e7e6'),
+    ('e2e4','c7c5','g1f3','d7d6'),
+    ('d2d4','g8f6','c2c4','g7g6'),
+    ('e2e4','e7e6','d2d4','d7d5'),
+    ('c2c4','e7e5','b1c3','g8f6'),
+    ('g1f3','d7d5','d2d4','g8f6'),
+    ('e2e4','c7c6','d2d4','d7d5'),
+)
 
 
 def positions():
+    """Opening-family split prevents train/validation continuation leakage."""
     rng = random.Random(SEED)
     out = []
-    while len(out) < SAMPLES:
-        b = chess.Board()
-        for _ in range(rng.randrange(8, 54)):
-            if b.is_game_over(): break
-            b.push(rng.choice(list(b.legal_moves)))
-        if not b.is_game_over() and abs(material(b)) < 1400:
-            out.append(b)
+    for family, opening in enumerate(OPENINGS):
+        for _ in range(SAMPLES // len(OPENINGS)):
+            b = chess.Board()
+            for u in opening:
+                b.push_uci(u)
+            for _ in range(rng.randrange(2, 19)):
+                if b.is_game_over(): break
+                b.push(rng.choice(list(b.legal_moves)))
+            if not b.is_game_over() and abs(material(b)) < 1400:
+                out.append((family, b))
     return out
 
 
@@ -60,25 +67,29 @@ def main():
     rows = []
     with chess.engine.SimpleEngine.popen_uci(binary) as teacher:
         teacher.configure({'Threads': 1, 'Hash': 16})
-        for b in positions():
+        for family, b in positions():
             info = teacher.analyse(b, chess.engine.Limit(depth=DEPTH))
             score = info['score'].white().score(mate_score=10000)
-            rows.append((score, material(b), controlled_squares(b)))
+            if abs(score) > 2000: continue
+            rows.append((family, score, material(b), controlled_squares(b)))
     # Hold out every fourth position, never tune on evaluation samples.
-    train = [row for i, row in enumerate(rows) if i % 4 != 0]
-    holdout = [row for i, row in enumerate(rows) if i % 4 == 0]
+    train = [row[1:] for row in rows if row[0] < 6]
+    holdout = [row[1:] for row in rows if row[0] >= 6]
+    assert len(train) >= 50 and len(holdout) >= 15, 'Insufficient eligible samples'
     ranked = sorted(COEFFICIENTS, key=lambda w: mse(train, w))
     report = {
         'status': 'offline_teacher_fit_only',
         'teacher': f'Stockfish depth {DEPTH}',
         'seed': SEED, 'samples': len(rows),
         'train': len(train), 'holdout': len(holdout),
+        'split': 'six opening families train, two held out',
         'baseline_coefficient': 0,
         'candidate_coefficients': list(COEFFICIENTS),
         'best_train_coefficient': ranked[0],
         'holdout_mse_baseline': round(mse(holdout, 0), 2),
         'holdout_mse_best': round(mse(holdout, ranked[0]), 2),
         'holdout_mse_current_2': round(mse(holdout, 2), 2),
+        'holdout_improved': mse(holdout, ranked[0]) < mse(holdout, 0),
         'note': 'Teacher fit does not establish playing strength. Do not promote without paired games.'
     }
     print(json.dumps(report, indent=2))
