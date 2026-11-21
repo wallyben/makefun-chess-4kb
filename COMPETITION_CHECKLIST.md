@@ -115,3 +115,8 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - Maximum observed move latency: incumbent 0.047s; alpha-beta 1.331s; fixed-node 0.154s. These are observations, not proven worst-case bounds.
 - IMPORTANT: Official rules require fixed-depth/fixed-node deterministic search. The clock-based alpha-beta prototype is **ineligible**, irrespective of apparent game strength. Only deterministic candidates can be promoted.
 - Eight-game samples are insufficient to establish strength ranking; no challenger promoted. Next: paired direct matches, tactical suite, and official-kit acceptance for fixed-node candidate.
+
+## 2026-11-21 deterministic deeper-search challenger
+- Created isolated `experiment/fixed-node-deeper-20261121` commit `98164037` from fixed-node baseline: fixed node budget 3000 -> 12000, iterative depth attempts (1,2) -> (1,2,3). `main.py` remains 4092 ASCII bytes. No clock-based search.
+- Added candidate to Stockfish and rules matrices (commits 5079e78, 4069979). Pending: full Python 3.13 legality CI, no illegal moves/crashes, per-move latency below 10s, strength versus incumbent and fixed-node baseline.
+- WARNING: additional depth and node budget are a hypothesis, NOT measured Elo gain; do not promote without evidence.
