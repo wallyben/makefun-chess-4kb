@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121, experiment/fixed-node-deeper-20261121]
+        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121, experiment/fixed-node-deeper-20261121, experiment/ordered-search-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
