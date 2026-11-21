@@ -1,7 +1,11 @@
 name: Quality Gate
 on:
-  push:
   pull_request:
+    paths:
+      - 'engine.py'
+      - 'main.py'
+      - 'tests/**'
+      - '.github/workflows/quality.yml'
   workflow_dispatch:
 permissions:
   contents: read
