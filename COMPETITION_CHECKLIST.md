@@ -153,3 +153,8 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [ ] Evaluate transposition table and late-move reductions under the 4096-byte limit; only mark complete if actually implemented and validated.
 - [ ] Run paired head-to-head games and Stockfish tests with consistent openings, color swaps, crash/illegal/timeout gates; measure Elo with uncertainty.
 - [ ] Promote only a legal, runtime-safe challenger with reproducible strength improvement; preserve incumbent until then.
+
+### First search-budget calibration implementation
+- [x] Create isolated deterministic 25000-node candidate `experiment/nodes-25000-20261121` at `048a6c6`, 4092 bytes, otherwise identical to 12000-node baseline.
+- [x] Register 25000-node candidate in rules and Stockfish CI matrices (`d109074`, `bf8f66e`).
+- [ ] Measure its game runtime and strength; 50000/100000/200000 remain untested.
