@@ -88,12 +88,12 @@ def main():
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
    nodes=0
    for depth in 1,2,3:
-    best=-9999;chosen=m
+    best=-999;chosen=m
     try:
      for q in sorted(legal,key=lambda q:V.get(b[sq(q[2:4])].lower(),0),reverse=True):
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
-      a=99999;found=0
+      a=9999;found=0
       for r in replies(n,not w,e):
        found=1;a=min(a,search(r,w,w,depth-1,best,a))
        if a<=best:break
