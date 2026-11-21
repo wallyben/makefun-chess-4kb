@@ -49,8 +49,9 @@ jobs:
             # Matched openings: same deterministic prefix in both colours.
             prefixes=[[],['e2e4','e7e5'],['d2d4','d7d5'],['c2c4','e7e5'],['g1f3','d7d5']]
             for u in prefixes[(game_no//2)%len(prefixes)]:board.push_uci(u)
-            metrics={'game':game_no+1,'our_color':'white' if our_white else 'black','moves':0,'illegal':0,'crash':False,'censored':False}
+            metrics={'game':game_no+1,'our_color':'white' if our_white else 'black','moves':0,'illegal':0,'crash':False,'censored':False,'max_move_seconds':0.0}
             lock=threading.Lock()
+            request_time=[None]
             def stock_move():
              if not board.is_game_over(claim_draw=True):
               choice=stock.play(board,chess.engine.Limit(time=0.05)).move
@@ -65,7 +66,11 @@ jobs:
               with lock:
                if self.path=='/game':
                 response=state()
+                if response['status']=='your_move':request_time[0]=time.monotonic()
                elif self.path=='/move':
+                if request_time[0] is not None:
+                 metrics['max_move_seconds']=max(metrics['max_move_seconds'],round(time.monotonic()-request_time[0],3))
+                 request_time[0]=None
                 u=data.get('move','')
                 if u not in [m.uci() for m in board.legal_moves] or data.get('game')!='baseline':
                  metrics['illegal']+=1
@@ -101,7 +106,7 @@ jobs:
             print(json.dumps(metrics),flush=True)
           finally:stock.quit()
           Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'${{ matrix.candidate }}','opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
-          assert all(not x['crash'] and x['illegal']==0 for x in results),'Engine crash or illegal move'
+          assert all(not x['crash'] and x['illegal']==0 and x['max_move_seconds']<10 for x in results),'Engine crash, illegal move, or move over 10s'
           print('BENCHMARK COMPLETE; unfinished games are censored, not draws')
           PY
       - uses: actions/upload-artifact@v4
