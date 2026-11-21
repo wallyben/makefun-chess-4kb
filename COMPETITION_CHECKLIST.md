@@ -80,7 +80,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 
 ### D. Tournament evidence
 - [x] Complete initial three-candidate screening (run 44898748268).
-- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates (focused 8-game paired-colour screening configured 4d39ae6; corrected 35-second whole-game timeout to 180 seconds in f99b297; CI pending).
+- [x] Finish latest alpha-beta/benchmark screening and identify eligibility failures (run 44902734559; alpha-beta clock-based cutoff is ineligible under official deterministic-search rule; fixed-node challenger remains experimental).
 - [ ] Run paired head-to-head against incumbent champion with fixed openings and alternating colors.
 - [ ] Benchmark against Sunfish 4KB and record W/D/L plus confidence/uncertainty.
 - [ ] Verify official practice rating >=1154 and record platform evidence.
@@ -109,3 +109,9 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - **New isolated challenger:** `experiment/fixed-node-20261121` commit `0d3c92d`, `main.py` 4092 bytes. Replaces clock cutoff with fixed 3000 search-node budget, retaining last-completed-depth fallback. Acceptance: Python 3.13 legality/protocol CI, <=10s/move, no crashes, and reproducible strength versus champion; stop/reject if any fail. No promotion yet.
 - **Verification:** existing candidate-rules and Stockfish benchmark PR workflow matrices updated in commits `3720109`, `2496641` to include fixed-node challenger; runs 44902714890 and 44902714861 queued at inspection. Official kit acceptance, practice Elo, transcript and full snapshot size remain UNKNOWN.
 - **Current champion:** `submission-minimal` `ca334ddbb43253ba84db40dbd09817be5779c39e`, 3790-byte main.py. **NO-GO** official submission pending owner approval and final gates.
+
+## 2026-11-21 latest benchmark and eligibility gate (run 44902734559)
+- Latest Stockfish 1320 configured screening, eight games per candidate: incumbent 0W/8L/0 unfinished, alpha-beta 0W/3L/5 unfinished, fixed-node 0W/6L/2 unfinished. No crashes, illegal moves or per-move overruns. Unfinished are censored, **not draws**.
+- Maximum observed move latency: incumbent 0.047s; alpha-beta 1.331s; fixed-node 0.154s. These are observations, not proven worst-case bounds.
+- IMPORTANT: Official rules require fixed-depth/fixed-node deterministic search. The clock-based alpha-beta prototype is **ineligible**, irrespective of apparent game strength. Only deterministic candidates can be promoted.
+- Eight-game samples are insufficient to establish strength ranking; no challenger promoted. Next: paired direct matches, tactical suite, and official-kit acceptance for fixed-node candidate.
