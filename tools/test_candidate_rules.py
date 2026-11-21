@@ -62,6 +62,25 @@ def main():
             n=b.copy();n.push(m)
             expected.add("".join(candidate.board(n.fen())))
         assert actual==expected,(fen,len(actual),len(expected),len(actual^expected))
+    # Reproducible diverse midgame states; exclude features not represented by
+    # replies(): castling and underpromotions, which require separate handling.
+    import random
+    rng=random.Random(20261121)
+    for game in range(8):
+        b=chess.Board()
+        for ply in range(30):
+            if b.is_game_over():break
+            choices=sorted(b.legal_moves,key=lambda m:m.uci())
+            b.push(rng.choice(choices))
+            if b.castling_rights or b.is_game_over():continue
+            if any(m.promotion in (chess.ROOK,chess.BISHOP,chess.KNIGHT) for m in b.legal_moves):continue
+            ep=candidate.sq(chess.square_name(b.ep_square)) if b.ep_square is not None else -1
+            actual={"".join(x) for x in candidate.replies(candidate.board(b.fen()),b.turn,ep)}
+            expected=set()
+            for m in b.legal_moves:
+                n=b.copy();n.push(m)
+                expected.add("".join(candidate.board(n.fen())))
+            assert actual==expected,(game,ply,b.fen(),len(actual),len(expected),len(actual^expected))
     print("Candidate board-state, legal-reply and king-safety regression checks passed")
 
 
