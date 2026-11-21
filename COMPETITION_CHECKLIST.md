@@ -241,3 +241,8 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [x] Isolated one-ply capture-only leaf extension in `experiment/quiescence-20261121`, 4094 bytes, commit `3941689`. This is NOT full quiescence (no stand-pat, checking evasions or capture ordering); it is an unproven ablation.
 - [x] Added candidate to rules and Stockfish CI (`85e6563`, `87d1966`) and 100-game-per-candidate paired comparison (`d78a682`).
 - [ ] Confirm rules and time limits; reject if tactical results do not improve. Build proper stand-pat quiescence / Sunfish baseline instead of promoting on hypothesis.
+
+## Queue and execution control
+- [x] Added GitHub Actions concurrency cancellation for superseded PR runs in four high-volume workflows, commits `4103f32`, `29a50e3`, `5b21627`, `f130141`. Intended to avoid redundant 400-game matrices on every commit.
+- [ ] Verify latest tournament and scorer runs actually start and finish; current GitHub jobs remain queued, so no result or Elo improvement is established.
+- [ ] Prioritize proper compact alpha-beta/PVS with stand-pat quiescence and TT over additional superficial variants; gate on real completed-game evidence.
