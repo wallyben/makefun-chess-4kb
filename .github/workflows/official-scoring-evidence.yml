@@ -21,13 +21,14 @@ jobs:
           cp "$K/program/scorer/score.mjs" official-score.mjs
           cp "$K/program/generator/calibration.json" official-calibration.json
           cp "$K/program/env/server.mjs" official-server.mjs
-          cp "$K/competition.yaml" official-competition.yaml
+          if [ -f "$K/competition.yaml" ]; then cp "$K/competition.yaml" official-competition.yaml; else echo "Competition YAML not present in official kit"; fi
           cp "$K/kit.json" official-kit.json
           cp "$K/practice/trial-0/input/env/gauntlet.json" official-practice-gauntlet.json
           python - <<'PY'
           from pathlib import Path
           import json,re
           for name in ['official-rules.txt','official-score.mjs','official-server.mjs','official-competition.yaml','official-kit.json']:
+           if not Path(name).exists():continue
            s=Path(name).read_text()
            print('\n===== '+name+' ('+str(len(s.encode()))+' bytes) =====')
            if len(s)<15000:print(s)
