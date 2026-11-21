@@ -143,3 +143,13 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [x] Capture-order Stockfish eight-game job completed successfully in run 44906293671: 1 win, 2 draws, 4 losses, 1 unfinished/censored; maximum observed move 0.320 seconds; zero illegal moves or crashes.
 - [ ] Establish a statistically reliable Elo gain. This eight-game result is insufficient, and previous 12000-node deeper candidate achieved 2 wins / 6 losses in a different run.
 - [ ] Wait for expensive internal-ordering candidate results; compare paired games and avoid promoting on noise.
+
+## Search-budget calibration and strategic-depth upgrade (2026-11-21)
+- [x] Define deterministic search-budget calibration plan; respect competition fixed-node/fixed-depth rule, never use wall-clock cutoff.
+- [ ] Benchmark node limits 25000, 50000, 100000 and 200000 across opening, middlegame, tactics and endgame, including worst-case move time and HTTP overhead.
+- [ ] Choose a safe fixed-node cap from worst-case measurements, targeting <=8.5 seconds search and <=10 seconds total per move (not a clock-based stopping condition).
+- [ ] Implement iterative deepening that retains the last fully completed depth result and deterministic move ordering.
+- [ ] Implement and verify quiescence search and mate-aware terminal scoring with correct checkmate/stalemate detection.
+- [ ] Evaluate transposition table and late-move reductions under the 4096-byte limit; only mark complete if actually implemented and validated.
+- [ ] Run paired head-to-head games and Stockfish tests with consistent openings, color swaps, crash/illegal/timeout gates; measure Elo with uncertainty.
+- [ ] Promote only a legal, runtime-safe challenger with reproducible strength improvement; preserve incumbent until then.
