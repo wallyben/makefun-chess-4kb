@@ -3,13 +3,13 @@
 Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence link or commit. Do not confuse a passing CI workflow with chess strength.
 
 ## 1. Establish baseline
-- [ ] Complete all three Stockfish candidates (run 44898272468; tactical job still running at last inspection).
+- [x] Complete initial three-candidate Stockfish screening (run 44898748268; tactical limited to 8 games; not a statistically controlled strength ranking).
 - [ ] Select strongest candidate from completed-game results; require sufficient evidence.
 - [ ] Record W/D/L, unfinished, crashes, illegal moves, and per-move latency (latency instrumentation missing).
 
 ## 2. Competitive engine
 - [ ] Verify castling, en passant, all promotions, checkmate and stalemate (targeted special-move tests passed; full coverage pending).
-- [ ] Implement compact alpha-beta pruning.
+- [ ] Implement compact alpha-beta pruning (4096-byte prototype on experiment/alphabeta-20261121; benchmark pending).
 - [ ] Implement move ordering.
 - [ ] Implement bounded quiescence search.
 - [ ] Implement iterative deepening and strict move deadline.
@@ -43,3 +43,7 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - Tactical challenger: 3867 bytes, commit fed34df; pending benchmark.
 - 20-game Stockfish test (run 44898272468): original 2W 13L 1D 4 unfinished; mobility 3W 13L 1D 3 unfinished. Both zero illegal moves and zero crashes.
 - NO-GO for promotion/submission until gates pass.
+
+## New evidence 2026-11-21
+- Tactical extension: 8 games, 0W 3L 1D 4 unfinished, max observed move latency 0.289s, 0 crashes/illegal moves (run 44898748268). Reject promotion; 8-game sample is small.
+- Alpha-beta prototype commit 3acea117, exactly 4096 bytes. Not yet validated or promoted.
