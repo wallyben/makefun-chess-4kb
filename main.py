@@ -68,7 +68,7 @@ def replies(b,w,ep=-1):
 def search(b,w,us,d,lo,hi):
  global nodes
  nodes+=1
- if nodes>12000:raise TimeoutError
+ if nodes>25000:raise TimeoutError
  if not d:return score(b,us)
  found=0
  for n in replies(b,w):
