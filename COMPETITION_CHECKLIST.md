@@ -212,3 +212,10 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [ ] Inspect nested harness and official scorer; identify reproducible house engines, verify kit protocol and scoring locally.
 - [ ] Implement proven PVS/quiescence/TT architecture or legally adapted classic Sunfish within 4096 bytes and 8192-byte snapshot; test independently before promotion.
 - [ ] Await phase-eval benchmark and reject if no credible improvement.
+
+## Verified continuation (2026-11-21)
+- [x] Phase-eval 4086-byte candidate passed rules CI (run 44921655841); eight-game Stockfish run 44921655935: 1W/2D/4L/1 unfinished, max 0.754s. Mate-terminal same run 1W/1D/4L/2 unfinished, max 0.269s. No justified promotion from tiny sample.
+- [x] Official kit audit run 44921655844 passed. Outer kit contains starter/main.py (2996 bytes), RULES.txt, calibration, scorer, server, harness source tarball, but no agent/sunfish-4k/main.py. The 3649-byte house binary is NOT recovered. Stop labelling starter as Sunfish.
+- [x] Fixed stockfish-baseline CI false failure by removing duplicate official_kit_audit job which incorrectly required missing house path; commit f25dafd.
+- [ ] Implement harness-driven exact official scoring; inspect bundled scorer/gauntlet before changing engine architecture.
+- [ ] Obtain or reproduce genuinely compliant classic Sunfish / PeSTO+PVS engine with source provenance, then compare with control in paired 100+ game tests.
