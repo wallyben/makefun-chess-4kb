@@ -236,3 +236,8 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [x] Registered 30k candidate in Stockfish and legality matrices, commits `c1c3039` and `e348ad8`.
 - [x] Expanded paired comparison to 300 total games (100 each of mate-terminal, phase-eval, 30k nodes), commit `d84741c`.
 - [ ] Await actual game outcomes, 10-second cap and regression gates before promotion. This is a search-budget ablation, not Sunfish/PVS integration.
+
+## Tactical search experiment
+- [x] Isolated one-ply capture-only leaf extension in `experiment/quiescence-20261121`, 4094 bytes, commit `3941689`. This is NOT full quiescence (no stand-pat, checking evasions or capture ordering); it is an unproven ablation.
+- [x] Added candidate to rules and Stockfish CI (`85e6563`, `87d1966`) and 100-game-per-candidate paired comparison (`d78a682`).
+- [ ] Confirm rules and time limits; reject if tactical results do not improve. Build proper stand-pat quiescence / Sunfish baseline instead of promoting on hypothesis.
