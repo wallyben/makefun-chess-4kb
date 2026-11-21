@@ -1,0 +1,118 @@
+name: Stockfish baseline experiment
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/stockfish-baseline.yml'
+  workflow_dispatch:
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121, experiment/fixed-node-deeper-20261121, experiment/ordered-search-20261121, experiment/capture-order-20261121, experiment/nodes-25000-20261121, experiment/mate-terminal-20261121]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install benchmark-only dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y stockfish
+          python -m pip install 'python-chess==1.999'
+      - name: Fetch exact isolated competition candidate
+        run: |
+          git fetch origin submission-minimal experiment/alphabeta-20261121 experiment/fixed-node-20261121 experiment/fixed-node-deeper-20261121 experiment/ordered-search-20261121 experiment/capture-order-20261121 experiment/nodes-25000-20261121 experiment/mate-terminal-20261121
+          git show origin/${{ matrix.candidate }}:main.py > /tmp/tiny_chess_candidate.py
+          python - <<'PY'
+          import pathlib,ast
+          p=pathlib.Path('/tmp/tiny_chess_candidate.py')
+          assert p.stat().st_size<=4096
+          ast.parse(p.read_text())
+          print('candidate_bytes',p.stat().st_size)
+          PY
+      - name: Paired colour Stockfish baseline (no official Elo claim)
+        run: |
+          python - <<'PY'
+          import chess,chess.engine,threading,http.server,json,os,subprocess,time,sys
+          from pathlib import Path
+          engine_path='/tmp/tiny_chess_candidate.py'
+          stock=chess.engine.SimpleEngine.popen_uci('/usr/games/stockfish')
+          stock.configure({'UCI_LimitStrength':True,'UCI_Elo':1320,'Threads':1,'Hash':16})
+          results=[]
+          try:
+           for game_no in range(8):
+            our_white=game_no%2==0
+            board=chess.Board()
+            # Matched openings: same deterministic prefix in both colours.
+            prefixes=[[],['e2e4','e7e5'],['d2d4','d7d5'],['c2c4','e7e5'],['g1f3','d7d5']]
+            for u in prefixes[(game_no//2)%len(prefixes)]:board.push_uci(u)
+            metrics={'game':game_no+1,'our_color':'white' if our_white else 'black','moves':0,'illegal':0,'crash':False,'censored':False,'max_move_seconds':0.0}
+            lock=threading.Lock()
+            request_time=[None]
+            def stock_move():
+             if not board.is_game_over(claim_draw=True):
+              choice=stock.play(board,chess.engine.Limit(time=0.05)).move
+              board.push(choice)
+            if not our_white:stock_move()
+            class Handler(http.server.BaseHTTPRequestHandler):
+             def log_message(self,*args):pass
+             def do_POST(self):
+              size=int(self.headers.get('Content-Length','0'))
+              try:data=json.loads(self.rfile.read(size))
+              except Exception:data={}
+              with lock:
+               if self.path=='/game':
+                response=state()
+                if response['status']=='your_move':request_time[0]=time.monotonic()
+               elif self.path=='/move':
+                if request_time[0] is not None:
+                 metrics['max_move_seconds']=max(metrics['max_move_seconds'],round(time.monotonic()-request_time[0],3))
+                 request_time[0]=None
+                u=data.get('move','')
+                if u not in [m.uci() for m in board.legal_moves] or data.get('game')!='baseline':
+                 metrics['illegal']+=1
+                 response={'status':'done'}
+                else:
+                 board.push_uci(u);metrics['moves']+=1
+                 if not board.is_game_over(claim_draw=True) and board.fullmove_number<=61:stock_move()
+                 response=state()
+                 if response['status']=='your_move':request_time[0]=time.monotonic()
+               else:
+                self.send_error(404);return
+              payload=json.dumps(response).encode()
+              self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(payload)));self.end_headers();self.wfile.write(payload)
+            def state():
+             if board.is_game_over(claim_draw=True) or board.fullmove_number>61 or metrics['illegal']:
+              return {'status':'done'}
+             return {'status':'your_move','game':'baseline','fen':board.fen(),'legal_moves':[m.uci() for m in board.legal_moves]}
+            server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler)
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            env=dict(os.environ,MAKEFUN_ENV_URL=f'http://127.0.0.1:{server.server_port}')
+            t=time.monotonic()
+            try:
+             p=subprocess.run([sys.executable,engine_path],env=env,text=True,capture_output=True,timeout=180)
+             metrics['elapsed_seconds']=round(time.monotonic()-t,3)
+             metrics['crash']=p.returncode!=0
+             if metrics['crash']:metrics['stderr']=p.stderr[-1000:]
+            except subprocess.TimeoutExpired:
+             metrics['crash']=True;metrics['elapsed_seconds']=round(time.monotonic()-t,3)
+            finally:
+             server.shutdown();server.server_close()
+            metrics['censored']=not board.is_game_over(claim_draw=True)
+            metrics['result']=board.result(claim_draw=True) if not metrics['censored'] else 'unfinished'
+            results.append(metrics)
+            print(json.dumps(metrics),flush=True)
+          finally:stock.quit()
+          Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'${{ matrix.candidate }}','opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
+          assert all(not x['crash'] and x['illegal']==0 and x['max_move_seconds']<10 for x in results),'Engine crash, illegal move, or move over 10s'
+          print('BENCHMARK COMPLETE; unfinished games are censored, not draws')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || 'fixed-node' }}
+          path: stockfish-baseline-results.json
+

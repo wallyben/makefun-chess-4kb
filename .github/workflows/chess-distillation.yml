@@ -1,0 +1,28 @@
+name: Offline chess knowledge distillation
+on:
+  pull_request:
+    paths:
+      - 'tools/distill_mobility.py'
+      - '.github/workflows/chess-distillation.yml'
+  workflow_dispatch:
+jobs:
+  teacher-fit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install development-only tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y stockfish
+          python -m pip install 'python-chess==1.999'
+      - name: Distill Stockfish positional preferences with holdout validation
+        run: python tools/distill_mobility.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: distillation-results
+          path: distillation-results.json
