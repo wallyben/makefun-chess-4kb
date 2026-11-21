@@ -1,0 +1,42 @@
+name: Official Tiny Chess kit audit
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/official-kit-audit.yml'
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and inspect official competition kit
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://make.fun/c/tiny-chess-01/kit -o /tmp/tiny-kit.tar.gz
+          mkdir -p /tmp/tiny-kit
+          tar -xzf /tmp/tiny-kit.tar.gz -C /tmp/tiny-kit
+          find /tmp/tiny-kit -type f | sort > official-kit-files.txt
+          find /tmp/tiny-kit -path '*/agent/sunfish-4k/main.py' -print > official-house-path.txt
+          HOUSE="$(head -1 official-house-path.txt)"
+          test -n "$HOUSE" && test -f "$HOUSE"
+          cp "$HOUSE" official-house-main.py
+          python - <<'PY'
+          import pathlib,ast,hashlib,json
+          p=pathlib.Path('official-house-main.py')
+          data=p.read_bytes()
+          print('house_main_bytes',len(data),'sha256',hashlib.sha256(data).hexdigest())
+          assert len(data)<=4096
+          ast.parse(data.decode())
+          print('Official house source parsed; runtime and licensing still require independent validation')
+          PY
+          grep -Ei 'RULES.txt|kit.json|agent/sunfish-4k|generator|calibration|practice|protocol|scorer' official-kit-files.txt | head -150
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-tiny-chess-kit-audit
+          path: |
+            official-kit-files.txt
+            official-house-path.txt
+            official-house-main.py
