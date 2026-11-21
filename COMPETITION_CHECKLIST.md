@@ -225,3 +225,8 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [x] Added 20-shard matrix workflow `.github/workflows/phase-comparison.yml` for 100 mate-terminal + 100 phase-eval games against Stockfish 1320 with matched deterministic opening prefixes and alternating colours, commits 2500462/f44c60c.
 - [ ] Wait for 200-game workflow run 44922619709, aggregate W/D/L/censored, move latency and crashes; reject phase-eval if improvement is unsupported.
 - [ ] Reconstruct official kit scoring harness and implement source-backed stronger chess architecture. No official Elo claim yet.
+
+## Official scoring extraction in progress
+- [x] Added isolated `.github/workflows/official-scoring-evidence.yml`, commit `296b487`, extracting official RULES, scorer, server, competition config, Elo calibration, trial-0 gauntlet, kit metadata as audit artifact.
+- [ ] Inspect official scoring evidence run 44922700046 and document exact win/qualification gates and protocol before building official-grade tournament harness.
+- [ ] Aggregate queued 200-game candidate comparison 44922619709, distinguishing completed/censored games and avoiding unsupported Elo claims.
