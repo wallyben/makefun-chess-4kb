@@ -230,3 +230,9 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [x] Added isolated `.github/workflows/official-scoring-evidence.yml`, commit `296b487`, extracting official RULES, scorer, server, competition config, Elo calibration, trial-0 gauntlet, kit metadata as audit artifact.
 - [ ] Inspect official scoring evidence run 44922700046 and document exact win/qualification gates and protocol before building official-grade tournament harness.
 - [ ] Aggregate queued 200-game candidate comparison 44922619709, distinguishing completed/censored games and avoiding unsupported Elo claims.
+
+## Implementation continuation
+- [x] Created deterministic 30,000-node mate-aware candidate on `experiment/nodes-30000-20261121`, commit `9c85e12`, preserving 4043-byte footprint and avoiding wall-clock termination.
+- [x] Registered 30k candidate in Stockfish and legality matrices, commits `c1c3039` and `e348ad8`.
+- [x] Expanded paired comparison to 300 total games (100 each of mate-terminal, phase-eval, 30k nodes), commit `d84741c`.
+- [ ] Await actual game outcomes, 10-second cap and regression gates before promotion. This is a search-budget ablation, not Sunfish/PVS integration.
