@@ -1,9 +1,10 @@
-import os,json,urllib.request
+import os,json
+from urllib import request as u
 U=os.environ['MAKEFUN_ENV_URL'].rstrip('/')
 V=dict(zip('pnbrqk',(100,320,330,500,900,0)))
 def post(p,d):
- r=urllib.request.Request(U+p,json.dumps(d).encode(),{'Content-Type':'application/json'})
- with urllib.request.urlopen(r,timeout=9) as f:return json.load(f)
+ r=u.Request(U+p,json.dumps(d).encode(),{'Content-Type':'application/json'})
+ with u.urlopen(r,timeout=9) as f:return json.load(f)
 def board(f):
  b=[]
  for row in f.split()[0].split('/'):
@@ -32,7 +33,7 @@ def attacks(b,w):
     if t in 'pnk' or b[j]!='.':break
     xx+=dx;yy+=dy
  return a
-def score(b,w):
+def ev(b,w):
  v=0
  for i,p in enumerate(b):
   if p=='.':continue
@@ -64,21 +65,21 @@ def replies(b,w,ep=-1):
       if n.index('K' if w else 'k') not in attacks(n,not w):yield n
     if q!='.' or t in 'pnk':break
     xx+=dx;yy+=dy
-def search(b,w,us,d,lo,hi):
+def srch(b,w,us,d,lo,hi):
  global N
  N+=1
  if N>12000:raise TimeoutError
- if d<0:return score(b,us)
+ if d<0:return ev(b,us)
  ck=b.index('K' if w else 'k') in attacks(b,not w)
  if not d and not ck:
-  v=score(b,us)
+  v=ev(b,us)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:return v
  fd=0
  for n in replies(b,w):
   if not d and not ck and n.count('.')<=b.count('.'):continue
-  fd=1;v=search(n,not w,us,d-1,lo,hi)
+  fd=1;v=srch(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
@@ -102,11 +103,11 @@ def main():
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
       a=99999;fd=0
       for r in replies(n,not w,e):
-       fd=1;a=min(a,search(r,w,w,D-1,best,a))
+       fd=1;a=min(a,srch(r,w,w,D-1,best,a))
        if a<=best:break
       if not fd:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
       if a>best:best=a;ch=q
      m=ch
     except TimeoutError:break
    s=post('/move',{'game':s['game'],'move':m})
-main()
+if __name__=='__main__':main()
