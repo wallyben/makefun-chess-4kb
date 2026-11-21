@@ -87,7 +87,6 @@ def main():
     assert chess.Move.from_uci("e5d6") not in pinned.legal_moves
     ep=candidate.sq("d6")
     generated={"".join(x) for x in candidate.replies(candidate.board(pinned_ep),True,ep)}
-    assert generated=={"".join(candidate.board((lambda x:x)(pinned.copy(stack=False)).fen()))} if False else True
     expected=set()
     for m in pinned.legal_moves:
         nxt=pinned.copy();nxt.push(m)
