@@ -36,10 +36,10 @@ def score(b,w):
  v=0
  for i,p in enumerate(b):
   if p=='.':continue
-  friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
-  center=6-abs(2*x-7)//2-abs(2*y-7)//2
-  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else center*3 if t in 'rq' else 0)
-  v+=(V[t]+bonus)*(1 if friendly else -1)
+  f=p.isupper()==w;t=p.lower();x=i%8;y=i//8
+  c=6-abs(2*x-7)//2-abs(2*y-7)//2
+  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else c*8 if t in 'nb' else c*3 if t in 'rq' else 0)
+  v+=(V[t]+bonus)*(1 if f else -1)
  return v
 def replies(b,w,ep=-1):
  for i,p in enumerate(b):
@@ -47,12 +47,12 @@ def replies(b,w,ep=-1):
   t=p.lower();x=i%8;y=i//8
   if t=='p':
    d=-1 if w else 1
-   steps=[(0,d)] if 0<=y+d<8 and b[i+8*d]=='.' else []
-   if steps and y==(6 if w else 1) and b[i+16*d]=='.':steps.append((0,2*d))
-   steps += [(dx,d) for dx in (-1,1) if 0<=x+dx<8 and 0<=y+d<8 and ((b[i+8*d+dx]!='.' and b[i+8*d+dx].isupper()!=w) or i+8*d+dx==ep)]
-  elif t=='n':steps=[(1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)]
-  else:steps=([(1,1),(-1,1),(1,-1),(-1,-1)] if t=='b' else [(1,0),(-1,0),(0,1),(0,-1)] if t=='r' else [(1,1),(-1,1),(1,-1),(-1,-1),(1,0),(-1,0),(0,1),(0,-1)])
-  for dx,dy in steps:
+   st=[(0,d)] if 0<=y+d<8 and b[i+8*d]=='.' else []
+   if st and y==(6 if w else 1) and b[i+16*d]=='.':st.append((0,2*d))
+   st += [(dx,d) for dx in (-1,1) if 0<=x+dx<8 and 0<=y+d<8 and ((b[i+8*d+dx]!='.' and b[i+8*d+dx].isupper()!=w) or i+8*d+dx==ep)]
+  elif t=='n':st=[(1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)]
+  else:st=([(1,1),(-1,1),(1,-1),(-1,-1)] if t=='b' else [(1,0),(-1,0),(0,1),(0,-1)] if t=='r' else [(1,1),(-1,1),(1,-1),(-1,-1),(1,0),(-1,0),(0,1),(0,-1)])
+  for dx,dy in st:
    xx,yy=x+dx,y+dy
    while 0<=xx<8 and 0<=yy<8:
     j=yy*8+xx;q=b[j]
@@ -69,14 +69,19 @@ def search(b,w,us,d,lo,hi):
  nodes+=1
  if nodes>12000:raise TimeoutError
  if d<0:return score(b,us)
- found=0
+ if not d:
+  v=score(b,us)
+  if w==us:lo=max(lo,v)
+  else:hi=min(hi,v)
+  if lo>=hi:return v
+ fd=0
  for n in replies(b,w):
   if not d and n.count('.')<=b.count('.'):continue
-  found=1;v=search(n,not w,us,d-1,lo,hi)
+  fd=1;v=search(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not found:return score(b,us) if not d else (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
+ if not fd:return v if not d else (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
  return lo if w==us else hi
 def main():
  global nodes
@@ -89,18 +94,18 @@ def main():
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
    nodes=0
    for depth in (1,2,3):
-    best=-9999;chosen=m
+    best=-9999;ch=m
     try:
      for q in sorted(legal):
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
-      a=99999;found=0
+      a=99999;fd=0
       for r in replies(n,not w,e):
-       found=1;a=min(a,search(r,w,w,depth-1,best,a))
+       fd=1;a=min(a,search(r,w,w,depth-1,best,a))
        if a<=best:break
-      if not found:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
-      if a>best:best=a;chosen=q
-     m=chosen
+      if not fd:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
+      if a>best:best=a;ch=q
+     m=ch
     except TimeoutError:break
    s=post('/move',{'game':s['game'],'move':m})
 main()
