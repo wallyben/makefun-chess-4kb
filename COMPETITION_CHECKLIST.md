@@ -8,7 +8,7 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - [ ] Record W/D/L, unfinished, crashes, illegal moves, and per-move latency (latency instrumentation missing).
 
 ## 2. Competitive engine
-- [ ] Verify castling, en passant, promotions, checkmate and stalemate.
+- [ ] Verify castling, en passant, all promotions, checkmate and stalemate (targeted special-move tests passed; full coverage pending).
 - [ ] Implement compact alpha-beta pruning.
 - [ ] Implement move ordering.
 - [ ] Implement bounded quiescence search.
@@ -22,7 +22,7 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - [ ] Verify distilled candidate wins paired matches.
 
 ## 4. Strength and correctness
-- [ ] Special-rule regression suite.
+- [x] Special-rule regression suite (targeted castling, en passant, queen promotions and king safety; run 44898748282).
 - [ ] Verify <=10s per move under target environment.
 - [ ] Beat previous champion in reproducible paired matches.
 - [ ] Larger Stockfish benchmark.
