@@ -170,3 +170,10 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [ ] Confirm rules, runtime, and tournament strength against original 12000-node engine; do not promote until evidence.
 - [ ] Restore hanging-piece evaluation or replace with a stronger byte-efficient tactical evaluator; prototype removed it to fit mate scoring.
 - [ ] Larger paired games and statistically justified Elo gain remain pending.
+
+## 2026-11-21 checkmate-aware benchmark results
+- [x] GitHub Actions rules regression succeeded: run 44909682967.
+- [x] Stockfish benchmark succeeded: run 44909683001. Checkmate-aware 12000-node candidate 5W/1D/1L/1 unfinished (censored), maximum observed move 0.229s, 0 illegal moves, 0 crashes.
+- [x] Same run original 12000-node candidate 0W/0D/4L/4 unfinished; 25000-node candidate 1W/0D/6L/1 unfinished; ordered-search candidate 3W/2D/3L/0 unfinished.
+- [ ] Confirm mate-aware improvement with larger, paired head-to-head tests and position-level tactical checks; eight-game benchmark is not enough to prove Elo improvement.
+- [ ] Reassess hanging-piece penalty removal and test worst-case latency; do not automatically promote to submission branch.
