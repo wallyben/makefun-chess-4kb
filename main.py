@@ -87,7 +87,7 @@ def main():
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
    end=time.monotonic()+3
    for depth in (1,2):
-    best=-1000000;chosen=m
+    best=-99999;chosen=m
     try:
      for q in sorted(legal):
       n=move(b,q);e=-1
