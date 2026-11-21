@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        candidate: [submission-minimal, experiment/alphabeta-20261121]
+        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -24,7 +24,7 @@ jobs:
           python -m pip install 'python-chess==1.999'
       - name: Fetch exact isolated competition candidate
         run: |
-          git fetch origin submission-minimal experiment/mobility-eval-20261121 experiment/tactical-extension-20261121 experiment/alphabeta-20261121
+          git fetch origin submission-minimal experiment/alphabeta-20261121 experiment/fixed-node-20261121
           git show origin/${{ matrix.candidate }}:main.py > /tmp/tiny_chess_candidate.py
           python - <<'PY'
           import pathlib,ast
@@ -113,5 +113,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || 'alphabeta' }}
+          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || 'fixed-node' }}
           path: stockfish-baseline-results.json
