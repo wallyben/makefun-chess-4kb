@@ -137,3 +137,9 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [x] Register cheap-order candidate in legality and Stockfish matrices (commits `3ea14a3`, `9540df0`).
 - [ ] Establish cheap-order legality, runtime, and strength versus expensive-sort candidate from completed CI.
 - [ ] Quiescence, transposition table and late-move reductions remain unimplemented; no claim of significant Elo increase.
+
+## 2026-11-21 capture-order first completed run
+- [x] Capture-order candidate passed candidate-rules regression in GitHub Actions run 44906293767.
+- [x] Capture-order Stockfish eight-game job completed successfully in run 44906293671: 1 win, 2 draws, 4 losses, 1 unfinished/censored; maximum observed move 0.320 seconds; zero illegal moves or crashes.
+- [ ] Establish a statistically reliable Elo gain. This eight-game result is insufficient, and previous 12000-node deeper candidate achieved 2 wins / 6 losses in a different run.
+- [ ] Wait for expensive internal-ordering candidate results; compare paired games and avoid promoting on noise.
