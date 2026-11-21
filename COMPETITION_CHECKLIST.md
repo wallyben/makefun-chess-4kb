@@ -131,3 +131,9 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [ ] Implement safe late-move reductions, if justified by measured benefit.
 - [ ] Restore or improve tactical/positional evaluation without sacrificing stronger search.
 - Note: To fit the 4096-byte cap the prototype removes attacked-piece penalty and simplifies center scoring; these are possible regressions. Move ordering by full position evaluation may cost substantial CPU; no Elo claim before tests.
+
+## 2026-11-21 search-cost ablation
+- [x] Create isolated cheap root-capture-order variant `experiment/capture-order-20261121` commit `8429689` (4051 bytes), removing full-board evaluation sorting at every internal search node while retaining capture-value root ordering.
+- [x] Register cheap-order candidate in legality and Stockfish matrices (commits `3ea14a3`, `9540df0`).
+- [ ] Establish cheap-order legality, runtime, and strength versus expensive-sort candidate from completed CI.
+- [ ] Quiescence, transposition table and late-move reductions remain unimplemented; no claim of significant Elo increase.
