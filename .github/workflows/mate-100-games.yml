@@ -1,8 +1,5 @@
 name: Mate-aware 100-game validation
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/mate-100-games.yml'
   workflow_dispatch:
 jobs:
   benchmark:
