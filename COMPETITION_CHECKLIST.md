@@ -58,7 +58,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 
 ### A. Correctness and runtime — mandatory
 - [x] Targeted rules regression passes on both baseline and alpha-beta branches (run 44899137617).
-- [ ] Resolve underpromotion test results and add checkmate/stalemate and en-passant edge cases (underpromotion test passed run 44899231967; terminal/edge-case tests pending).
+- [ ] Resolve underpromotion test results and add checkmate/stalemate and en-passant edge cases (underpromotion test passed run 44899231967; legal-reply comparison test committed 97f26105; CI pending).
 - [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search.
 - [ ] Verify 10-second hard limit on every candidate move in complete games.
 - [ ] Verify 4096-byte main.py, per-file limits and total snapshot limit on the exact final commit.
