@@ -83,7 +83,10 @@ def main():
     if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
     a=None
     for r in replies(n,not w,e):
-     z=score(r,w);a=z if a is None else min(a,z)
+     z=score(r,w)
+     if z<best+250:
+      z=max([z]+[score(t,w) for t in replies(r,w)])
+     a=z if a is None else min(a,z)
      if a<=best:break
     if a is None:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
     if a>best:best=a;m=q
