@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
 jobs:
   benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        candidate: [submission-minimal, experiment/mobility-eval-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -20,8 +24,8 @@ jobs:
           python -m pip install 'python-chess==1.999'
       - name: Fetch exact isolated competition candidate
         run: |
-          git fetch origin submission-minimal
-          git show origin/submission-minimal:main.py > /tmp/tiny_chess_candidate.py
+          git fetch origin submission-minimal experiment/mobility-eval-20261121
+          git show origin/${{ matrix.candidate }}:main.py > /tmp/tiny_chess_candidate.py
           python - <<'PY'
           import pathlib,ast
           p=pathlib.Path('/tmp/tiny_chess_candidate.py')
@@ -96,12 +100,12 @@ jobs:
             results.append(metrics)
             print(json.dumps(metrics),flush=True)
           finally:stock.quit()
-          Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'submission-minimal','opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
+          Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'${{ matrix.candidate }}','opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
           assert all(not x['crash'] and x['illegal']==0 for x in results),'Engine crash or illegal move'
           print('BENCHMARK COMPLETE; unfinished games are censored, not draws')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: stockfish-baseline
+          name: stockfish-baseline-${{ matrix.candidate == 'submission-minimal' && 'champion' || 'mobility' }}
           path: stockfish-baseline-results.json
