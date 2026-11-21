@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121, experiment/fixed-node-deeper-20261121, experiment/ordered-search-20261121, experiment/capture-order-20261121, experiment/nodes-25000-20261121, experiment/mate-terminal-20261121, experiment/phase-eval-20261121]
+        candidate: [submission-minimal, experiment/alphabeta-20261121, experiment/fixed-node-20261121, experiment/fixed-node-deeper-20261121, experiment/ordered-search-20261121, experiment/capture-order-20261121, experiment/nodes-25000-20261121, experiment/mate-terminal-20261121, experiment/phase-eval-20261121, experiment/nodes-30000-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -24,7 +24,7 @@ jobs:
           python -m pip install 'python-chess==1.999'
       - name: Fetch exact isolated competition candidate
         run: |
-          git fetch origin submission-minimal experiment/alphabeta-20261121 experiment/fixed-node-20261121 experiment/fixed-node-deeper-20261121 experiment/ordered-search-20261121 experiment/capture-order-20261121 experiment/nodes-25000-20261121 experiment/mate-terminal-20261121 experiment/phase-eval-20261121
+          git fetch origin submission-minimal experiment/alphabeta-20261121 experiment/fixed-node-20261121 experiment/fixed-node-deeper-20261121 experiment/ordered-search-20261121 experiment/capture-order-20261121 experiment/nodes-25000-20261121 experiment/mate-terminal-20261121 experiment/phase-eval-20261121 experiment/nodes-30000-20261121
           git show origin/${{ matrix.candidate }}:main.py > /tmp/tiny_chess_candidate.py
           python - <<'PY'
           import pathlib,ast
