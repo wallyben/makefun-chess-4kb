@@ -59,7 +59,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 ### A. Correctness and runtime — mandatory
 - [x] Targeted rules regression passes on both baseline and alpha-beta branches (run 44899137617).
 - [x] Verify underpromotions and targeted checkmate/stalemate/en-passant reply states against python-chess (run 44899408505; not exhaustive full-state verification).
-- [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search.
+- [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search (seeded midgame differential tests added eb4f8cd; CI pending; castling rights not modeled by replies).
 - [ ] Verify 10-second hard limit on every candidate move in complete games.
 - [ ] Verify 4096-byte main.py, per-file limits and total snapshot limit on the exact final commit.
 
@@ -80,7 +80,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 
 ### D. Tournament evidence
 - [x] Complete initial three-candidate screening (run 44898748268).
-- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates.
+- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates (focused 8-game paired-colour screening configured 4d39ae6; CI pending).
 - [ ] Run paired head-to-head against incumbent champion with fixed openings and alternating colors.
 - [ ] Benchmark against Sunfish 4KB and record W/D/L plus confidence/uncertainty.
 - [ ] Verify official practice rating >=1154 and record platform evidence.
