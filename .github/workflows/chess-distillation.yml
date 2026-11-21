@@ -1,9 +1,5 @@
 name: Offline chess knowledge distillation
 on:
-  pull_request:
-    paths:
-      - 'tools/distill_mobility.py'
-      - '.github/workflows/chess-distillation.yml'
   workflow_dispatch:
 jobs:
   teacher-fit:
