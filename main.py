@@ -1,4 +1,4 @@
-import os,json,urllib.request
+import os,json,urllib.request,time
 U=os.environ['MAKEFUN_ENV_URL'].rstrip('/')
 V=dict(zip('pnbrqk',(100,320,330,500,900,0)))
 def post(p,d):
@@ -35,10 +35,6 @@ def attacks(b,w):
 def score(b,w):
  own=attacks(b,w);opp=attacks(b,not w);v=0
  for i,p in enumerate(b):
-  if p=='K' or p=='k':
-   friendly=p.isupper()==w
-   if i in (opp if friendly else own):v+=-120 if friendly else 120
- for i,p in enumerate(b):
   if p=='.':continue
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   center=6-abs(2*x-7)//2-abs(2*y-7)//2
@@ -69,23 +65,40 @@ def replies(b,w,ep=-1):
       if n.index('K' if w else 'k') not in attacks(n,not w):yield n
     if q!='.' or t in 'pnk':break
     xx+=dx;yy+=dy
+def search(b,w,us,d,lo,hi):
+ if time.monotonic()>end:raise TimeoutError
+ if not d:return score(b,us)
+ found=0
+ for n in replies(b,w):
+  found=1;v=search(n,not w,us,d-1,lo,hi)
+  if w==us:lo=max(lo,v)
+  else:hi=min(hi,v)
+  if lo>=hi:break
+ if not found:return 0
+ return lo if w==us else hi
 def main():
- while True:
+ global end
+ while 1:
   s=post('/game',{})
   if s.get('status')=='done':return
   while s.get('status')=='your_move':
    legal=s['legal_moves']
    if not legal:break
-   b=board(s['fen']);w=s['fen'].split()[1]=='w'
-   best=-10**9;m=sorted(legal)[0]
-   for q in sorted(legal):
-    n=move(b,q);e=-1
-    if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
-    a=None
-    for r in replies(n,not w,e):
-     z=score(r,w);a=z if a is None else min(a,z)
-     if a<=best:break
-    if a is None:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
-    if a>best:best=a;m=q
+   b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
+   end=time.monotonic()+3
+   for depth in (1,2):
+    best=-1000000;chosen=m
+    try:
+     for q in sorted(legal):
+      n=move(b,q);e=-1
+      if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
+      a=1000000;found=0
+      for r in replies(n,not w,e):
+       found=1;a=min(a,search(r,w,w,depth-1,best,a))
+       if a<=best:break
+      if not found:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
+      if a>best:best=a;chosen=q
+     m=chosen
+    except TimeoutError:break
    s=post('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
