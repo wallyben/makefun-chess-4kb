@@ -1,8 +1,5 @@
 name: Search budget and evaluation controlled 400-game comparison
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/phase-comparison.yml'
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
