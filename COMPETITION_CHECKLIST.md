@@ -158,3 +158,8 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [x] Create isolated deterministic 25000-node candidate `experiment/nodes-25000-20261121` at `048a6c6`, 4092 bytes, otherwise identical to 12000-node baseline.
 - [x] Register 25000-node candidate in rules and Stockfish CI matrices (`d109074`, `bf8f66e`).
 - [ ] Measure its game runtime and strength; 50000/100000/200000 remain untested.
+
+### 2026-11-21 fixed-node budget decision (run 44906594246)
+- [x] Paired benchmark screen at the same Stockfish setting and eight-game schedule: 12000 nodes 5W/0D/1L/2 censored, max observed 0.660s; 25000 nodes 3W/0D/3L/2 censored, max observed 1.497s. Both zero reported illegal moves and crashes. These are censored screening games, NOT a validated Elo estimate or complete head-to-head match.
+- [x] REJECT promotion of 25000-node challenger for now: no demonstrated strength advantage over 12000-node baseline, despite longer runtime. Preserve both branch histories and submission-minimal champion.
+- [ ] Run direct same-opening, color-swapped 12000-vs-25000 matches before making a statistically confident strength ranking; official kit/practice Elo still UNKNOWN.
