@@ -1,8 +1,8 @@
 import os,json
-from urllib import request as u
+import urllib.request as u
 U=os.environ['MAKEFUN_ENV_URL'].rstrip('/')
 V=dict(zip('pnbrqk',(100,320,330,500,900,0)))
-def post(p,d):
+def P(p,d):
  r=u.Request(U+p,json.dumps(d).encode(),{'Content-Type':'application/json'})
  with u.urlopen(r,timeout=9) as f:return json.load(f)
 def board(f):
@@ -39,8 +39,8 @@ def ev(b,w):
   if p=='.':continue
   f=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   c=6-abs(2*x-7)//2-abs(2*y-7)//2
-  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else c*8 if t in 'nb' else c*3 if t in 'rq' else 0)
-  v+=(V[t]+bonus)*(1 if f else -1)
+  z=((6-y if p.isupper() else y-1)*9 if t=='p' else c*8 if t in 'nb' else c*3 if t in 'rq' else 0)
+  v+=(V[t]+z)*(1 if f else -1)
  return v
 def replies(b,w,ep=-1):
  for i,p in enumerate(b):
@@ -88,7 +88,7 @@ def srch(b,w,us,d,lo,hi):
 def main():
  global N
  while 1:
-  s=post('/game',{})
+  s=P('/game',{})
   if s.get('status')=='done':return
   while s.get('status')=='your_move':
    L=s['legal_moves']
@@ -98,7 +98,7 @@ def main():
    for D in (1,2,3):
     best=-9999;ch=m
     try:
-     for q in sorted(L):
+     for q in sorted(L,key=lambda q:q!=m):
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
       a=99999;fd=0
@@ -109,5 +109,5 @@ def main():
       if a>best:best=a;ch=q
      m=ch
     except OSError:break
-   s=post('/move',{'game':s['game'],'move':m})
+   s=P('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
