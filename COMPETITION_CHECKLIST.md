@@ -102,3 +102,10 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - Authoritative legal-reply comparison passed on both candidates, run 44899408505. Broader castling-rights and repeated-position search tests remain open.
 
 - Seeded randomized midgame legal-reply differential suite passed on both candidates, run 44899571298. This does not establish complete search-state correctness.
+
+## 2026-11-21 official-rule eligibility correction and measured delta
+- **PROVEN P0:** Official bounty requires fixed-depth or fixed-node deterministic search, *never a clock* (https://make.fun/bounty/tiny-chess-01). Alpha-beta `3acea117` uses `time.monotonic()` and is ineligible as written. Do not promote it.
+- **PROVEN benchmark:** 8 games each against Stockfish UCI_Elo 1320, run 44899658105: submission-minimal `ca334ddb` 0W/6L/1D/1 unfinished, max move 0.061s; alpha-beta `3acea117` 3W/5L/0D/0 unfinished, max move 0.928s. Both 0 illegal/0 crashes. These are separate samples, not direct paired head-to-head; insufficient to establish a robust superiority claim.
+- **New isolated challenger:** `experiment/fixed-node-20261121` commit `0d3c92d`, `main.py` 4092 bytes. Replaces clock cutoff with fixed 3000 search-node budget, retaining last-completed-depth fallback. Acceptance: Python 3.13 legality/protocol CI, <=10s/move, no crashes, and reproducible strength versus champion; stop/reject if any fail. No promotion yet.
+- **Verification:** existing candidate-rules and Stockfish benchmark PR workflow matrices updated in commits `3720109`, `2496641` to include fixed-node challenger; runs 44902714890 and 44902714861 queued at inspection. Official kit acceptance, practice Elo, transcript and full snapshot size remain UNKNOWN.
+- **Current champion:** `submission-minimal` `ca334ddbb43253ba84db40dbd09817be5779c39e`, 3790-byte main.py. **NO-GO** official submission pending owner approval and final gates.
