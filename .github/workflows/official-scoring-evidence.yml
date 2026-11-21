@@ -1,8 +1,5 @@
 name: Official scoring and protocol evidence
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/official-scoring-evidence.yml'
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
