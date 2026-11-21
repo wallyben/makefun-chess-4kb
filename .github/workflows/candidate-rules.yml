@@ -5,6 +5,9 @@ on:
       - 'tools/test_candidate_rules.py'
       - '.github/workflows/candidate-rules.yml'
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   rules:
     strategy:
