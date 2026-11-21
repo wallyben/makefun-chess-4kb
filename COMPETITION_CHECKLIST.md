@@ -8,8 +8,8 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - [ ] Record W/D/L, unfinished, crashes, illegal moves, and per-move latency (latency instrumentation missing).
 
 ## 2. Competitive engine
-- [ ] Verify castling, en passant, all promotions, checkmate and stalemate (targeted special-move tests passed; full coverage pending).
-- [ ] Implement and verify compact alpha-beta pruning (4096-byte prototype commit 3acea117; CI run 44898950450 failed before execution because branch was not fetched; corrected by 5317efa5; rerun pending).
+- [ ] Verify castling, en passant, all promotions, checkmate and stalemate (both candidates passed targeted regression run 44899137617; underpromotions and terminal states remain untested).
+- [x] Implement compact alpha-beta pruning (4096-byte prototype commit 3acea117; targeted regression passed run 44899137617; playing-strength acceptance separate).
 - [ ] Implement move ordering.
 - [ ] Implement bounded quiescence search.
 - [ ] Implement iterative deepening and strict move deadline.
@@ -49,3 +49,5 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - Alpha-beta prototype commit 3acea117, exactly 4096 bytes. Not yet validated or promoted.
 
 - CI regression matrix extended to submission-minimal and experiment/alphabeta-20261121 (commit 8b78345d). No challenger correctness/strength pass claimed until rerun finishes.
+
+- Alpha-beta and baseline both passed targeted rules matrix: run 44899137617. Benchmark run 44899137514 in progress at inspection.
