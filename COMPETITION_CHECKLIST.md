@@ -80,7 +80,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 
 ### D. Tournament evidence
 - [x] Complete initial three-candidate screening (run 44898748268).
-- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates (focused 8-game paired-colour screening configured 4d39ae6; CI pending).
+- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates (focused 8-game paired-colour screening configured 4d39ae6; corrected 35-second whole-game timeout to 180 seconds in f99b297; CI pending).
 - [ ] Run paired head-to-head against incumbent champion with fixed openings and alternating colors.
 - [ ] Benchmark against Sunfish 4KB and record W/D/L plus confidence/uncertainty.
 - [ ] Verify official practice rating >=1154 and record platform evidence.
