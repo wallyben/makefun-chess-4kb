@@ -9,7 +9,7 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 
 ## 2. Competitive engine
 - [ ] Verify castling, en passant, all promotions, checkmate and stalemate (targeted special-move tests passed; full coverage pending).
-- [ ] Implement compact alpha-beta pruning (4096-byte prototype on experiment/alphabeta-20261121; benchmark pending).
+- [ ] Implement and verify compact alpha-beta pruning (4096-byte prototype commit 3acea117; CI run 44898950450 failed before execution because branch was not fetched; corrected by 5317efa5; rerun pending).
 - [ ] Implement move ordering.
 - [ ] Implement bounded quiescence search.
 - [ ] Implement iterative deepening and strict move deadline.
@@ -47,3 +47,5 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 ## New evidence 2026-11-21
 - Tactical extension: 8 games, 0W 3L 1D 4 unfinished, max observed move latency 0.289s, 0 crashes/illegal moves (run 44898748268). Reject promotion; 8-game sample is small.
 - Alpha-beta prototype commit 3acea117, exactly 4096 bytes. Not yet validated or promoted.
+
+- CI regression matrix extended to submission-minimal and experiment/alphabeta-20261121 (commit 8b78345d). No challenger correctness/strength pass claimed until rerun finishes.
