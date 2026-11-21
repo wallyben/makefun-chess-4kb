@@ -33,13 +33,12 @@ def attacks(b,w):
     xx+=dx;yy+=dy
  return a
 def score(b,w):
- own=attacks(b,w);opp=attacks(b,not w);v=0
+ v=0
  for i,p in enumerate(b):
   if p=='.':continue
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
-  center=6-abs(2*x-7)//2-abs(2*y-7)//2
-  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else center*3 if t in 'rq' else 0)
-  if i in (opp if friendly else own) and i not in (own if friendly else opp):bonus-=V[t]*9//10
+  center=6-abs(x-3)-abs(y-3)
+  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else 0)
   v+=(V[t]+bonus)*(1 if friendly else -1)
  return v
 def replies(b,w,ep=-1):
@@ -71,27 +70,27 @@ def search(b,w,us,d,lo,hi):
  if nodes>12000:raise TimeoutError
  if not d:return score(b,us)
  found=0
- for n in replies(b,w):
+ for n in sorted(replies(b,w),key=lambda n:score(n,w),reverse=True):
   found=1;v=search(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not found:return 0
+ if not found:return (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
  return lo if w==us else hi
 def main():
  global nodes
  while 1:
   s=post('/game',{})
-  if s.get('status')=='done':return
-  while s.get('status')=='your_move':
+  if s['status']=='done':return
+  while s['status']=='your_move':
    legal=s['legal_moves']
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
    nodes=0
-   for depth in (1,2,3):
+   for depth in 1,2,3:
     best=-9999;chosen=m
     try:
-     for q in sorted(legal):
+     for q in sorted(legal,key=lambda q:V.get(b[sq(q[2:4])].lower(),0),reverse=True):
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
       a=99999;found=0
