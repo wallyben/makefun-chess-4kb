@@ -38,7 +38,7 @@ def score(b,w):
   if p=='.':continue
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   center=6-abs(2*x-7)//2-abs(2*y-7)//2
-  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else center*3 if t in 'rq' else 0)
+  bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*(8 if any(q.lower()=='q' for q in b) else 4) if t in 'nb' else center*3 if t in 'rq' else 0)
   v+=(V[t]+bonus)*(1 if friendly else -1)
  return v
 def replies(b,w,ep=-1):
