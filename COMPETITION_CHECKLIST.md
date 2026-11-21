@@ -219,3 +219,9 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [x] Fixed stockfish-baseline CI false failure by removing duplicate official_kit_audit job which incorrectly required missing house path; commit f25dafd.
 - [ ] Implement harness-driven exact official scoring; inspect bundled scorer/gauntlet before changing engine architecture.
 - [ ] Obtain or reproduce genuinely compliant classic Sunfish / PeSTO+PVS engine with source provenance, then compare with control in paired 100+ game tests.
+
+## Follow-up comparison execution (2026-11-21)
+- [x] Fixed Stockfish benchmark artifact collision by using unique matrix job-index names, commit b2d971e.
+- [x] Added 20-shard matrix workflow `.github/workflows/phase-comparison.yml` for 100 mate-terminal + 100 phase-eval games against Stockfish 1320 with matched deterministic opening prefixes and alternating colours, commits 2500462/f44c60c.
+- [ ] Wait for 200-game workflow run 44922619709, aggregate W/D/L/censored, move latency and crashes; reject phase-eval if improvement is unsupported.
+- [ ] Reconstruct official kit scoring harness and implement source-backed stronger chess architecture. No official Elo claim yet.
