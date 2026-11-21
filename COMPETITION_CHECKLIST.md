@@ -51,3 +51,50 @@ Deadline: 2026-11-24 17:00 UTC. Check boxes only with a reproducible evidence li
 - CI regression matrix extended to submission-minimal and experiment/alphabeta-20261121 (commit 8b78345d). No challenger correctness/strength pass claimed until rerun finishes.
 
 - Alpha-beta and baseline both passed targeted rules matrix: run 44899137617. Benchmark run 44899137514 in progress at inspection.
+
+## Maximum-strength finish plan (2026-11-21)
+
+These tasks supplement the eligibility and submission gates above. A checked implementation is not a claim of competitive superiority.
+
+### A. Correctness and runtime — mandatory
+- [x] Targeted rules regression passes on both baseline and alpha-beta branches (run 44899137617).
+- [ ] Resolve underpromotion test results and add checkmate/stalemate and en-passant edge cases.
+- [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search.
+- [ ] Verify 10-second hard limit on every candidate move in complete games.
+- [ ] Verify 4096-byte main.py, per-file limits and total snapshot limit on the exact final commit.
+
+### B. Search strength — priority order
+- [x] Build a bounded alpha-beta prototype (experiment/alphabeta-20261121, 4096 bytes; strength not established).
+- [ ] Verify iterative deepening preserves a completed move on timeout.
+- [ ] Add efficient move ordering (captures/promotions/checks or validated proxy).
+- [ ] Add bounded quiescence or selective tactical extensions.
+- [ ] Evaluate compact transposition caching or selective reductions ONLY if byte and runtime budgets permit.
+- [ ] Compare depth, nodes, tactical accuracy and game results against baseline.
+
+### C. Knowledge and endgames
+- [x] Build reproducible offline Stockfish teacher evaluation pipeline (run 44898196403).
+- [ ] Curate representative opening, tactical, quiet and endgame test positions with held-out validation.
+- [ ] Tune evaluation weights on training set and validate on held-out positions.
+- [ ] Accept learned weights only after a controlled game-strength improvement.
+- [ ] Test basic endgame conversion and draw recognition.
+
+### D. Tournament evidence
+- [x] Complete initial three-candidate screening (run 44898748268).
+- [ ] Finish alpha-beta Stockfish benchmark and reject invalid/time-violating candidates.
+- [ ] Run paired head-to-head against incumbent champion with fixed openings and alternating colors.
+- [ ] Benchmark against Sunfish 4KB and record W/D/L plus confidence/uncertainty.
+- [ ] Verify official practice rating >=1154 and record platform evidence.
+- [ ] Promote only the strongest eligible proven candidate.
+
+### E. Feature freeze and submission
+- [ ] Freeze changes by 2026-11-23 17:00 UTC unless a critical validity defect remains.
+- [ ] Run final clean-room Python 3.13 protocol and size verification.
+- [ ] Collect authentic development transcripts and provenance.
+- [ ] Submit official entry before 2026-11-24 17:00 UTC.
+- [ ] Preserve acceptance receipt, submitted commit, test logs and final ranking.
+
+### Stop rules
+- Never trade a proven legal submission for an unverified experiment.
+- Never infer Elo or strength from a small sample or teacher-evaluation MSE alone.
+- Prioritize search quality and correctness over speculative features.
+- At deadline, submit the strongest eligible verified version even if optimization targets remain unfinished.
