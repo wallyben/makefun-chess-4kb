@@ -68,22 +68,22 @@ def replies(b,w,ep=-1):
 def srch(b,w,us,d,lo,hi):
  global N
  N+=1
- if N>12000:raise TimeoutError
- if d<0:return ev(b,us)
+ if N>12000:raise OSError
  ck=b.index('K' if w else 'k') in attacks(b,not w)
- if not d and not ck:
+ if d<-2 or d<0 and not ck:return ev(b,us)
+ if d<1 and not ck:
   v=ev(b,us)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:return v
  fd=0
  for n in replies(b,w):
-  if not d and not ck and n.count('.')<=b.count('.'):continue
+  if d<1 and not ck and n.count('.')<=b.count('.'):continue
   fd=1;v=srch(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not fd:return v if not d and not ck else (-90000 if w==us else 90000) if ck else 0
+ if not fd:return v if d<1 and not ck else (-90000 if w==us else 90000) if ck else 0
  return lo if w==us else hi
 def main():
  global N
@@ -108,6 +108,6 @@ def main():
       if not fd:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
       if a>best:best=a;ch=q
      m=ch
-    except TimeoutError:break
+    except OSError:break
    s=post('/move',{'game':s['game'],'move':m})
 if __name__=='__main__':main()
