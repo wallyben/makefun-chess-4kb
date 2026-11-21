@@ -33,13 +33,12 @@ def attacks(b,w):
     xx+=dx;yy+=dy
  return a
 def score(b,w):
- own=attacks(b,w);opp=attacks(b,not w);v=0
+ v=0
  for i,p in enumerate(b):
   if p=='.':continue
   friendly=p.isupper()==w;t=p.lower();x=i%8;y=i//8
   center=6-abs(2*x-7)//2-abs(2*y-7)//2
   bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else center*8 if t in 'nb' else center*3 if t in 'rq' else 0)
-  if i in (opp if friendly else own) and i not in (own if friendly else opp):bonus-=V[t]*9//10
   v+=(V[t]+bonus)*(1 if friendly else -1)
  return v
 def replies(b,w,ep=-1):
@@ -76,7 +75,7 @@ def search(b,w,us,d,lo,hi):
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not found:return 0
+ if not found:return (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
  return lo if w==us else hi
 def main():
  global nodes
