@@ -177,3 +177,11 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [x] Same run original 12000-node candidate 0W/0D/4L/4 unfinished; 25000-node candidate 1W/0D/6L/1 unfinished; ordered-search candidate 3W/2D/3L/0 unfinished.
 - [ ] Confirm mate-aware improvement with larger, paired head-to-head tests and position-level tactical checks; eight-game benchmark is not enough to prove Elo improvement.
 - [ ] Reassess hanging-piece penalty removal and test worst-case latency; do not automatically promote to submission branch.
+
+## Proven chess-brain pivot — source-backed (2026-11-21)
+- [x] Research official Tiny Chess rules and reference engine: official house baseline uses Sunfish NNUE 4KB source at thomasahle/sunfish commit e396948acbd80cdcbad3dccfb07e878fba9df8f4, packed to 3649-byte main.py, fixed 50000-node search; GPL-3.0-only derivatives require permitted makefun bundle source upload and SPDX licence tag (https://make.fun/bounty/tiny-chess-01).
+- [ ] Obtain exact upstream source/house kit and verify licence, build procedure, protocol, determinism, size, and runtime in an isolated branch; do not copy unverified assets.
+- [ ] Build an independently compliant Sunfish-NNUE candidate using fixed nodes, correct game history/repetition, no external runtime chess brain or network, and required source bundle and authentic transcripts.
+- [ ] Run official kit quality gates, paired benchmarks against house Sunfish and current mate-terminal candidate, and official practice trial before any promotion.
+- [ ] Explore Stockfish teacher-guided tuning offline only; preserve legal and technical compliance.
+- [ ] Promote only measured improvement over proven baseline, rather than inventing unvalidated chess algorithms.
