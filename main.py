@@ -85,7 +85,7 @@ def main():
    legal=s['legal_moves']
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
-   end=time.monotonic()+3
+   end=time.monotonic()+2
    for depth in (1,2):
     best=-99999;chosen=m
     try:
