@@ -107,12 +107,12 @@ jobs:
             results.append(metrics)
             print(json.dumps(metrics),flush=True)
           finally:stock.quit()
-          Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'experiment/mate-terminal-20261121','shard':${{ matrix.shard }},'opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
+          Path('stockfish-baseline-results.json').write_text(json.dumps({'candidate':'${{ matrix.candidate }}','shard':${{ matrix.shard }},'opponent':'Stockfish UCI_Elo 1320 (approximate, not make.fun Elo)','games':results},indent=2))
           assert all(not x['crash'] and x['illegal']==0 and x['max_move_seconds']<10 for x in results),'Engine crash, illegal move, or move over 10s'
           print('BENCHMARK COMPLETE; unfinished games are censored, not draws')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mate-aware-100-shard-${{ matrix.shard }}
+          name: phase-compare-${{ strategy.job-index }}
           path: stockfish-baseline-results.json
