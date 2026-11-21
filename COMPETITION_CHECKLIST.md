@@ -59,7 +59,7 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 ### A. Correctness and runtime — mandatory
 - [x] Targeted rules regression passes on both baseline and alpha-beta branches (run 44899137617).
 - [x] Verify underpromotions and targeted checkmate/stalemate/en-passant reply states against python-chess (run 44899408505; not exhaustive full-state verification).
-- [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search (seeded midgame differential tests added eb4f8cd; CI pending; castling rights not modeled by replies).
+- [ ] Verify candidate's full game-state correctness, including castling rights and en-passant in deeper search (seeded midgame differential tests passed on both candidates in run 44899571298; castling rights not modeled by replies).
 - [ ] Verify 10-second hard limit on every candidate move in complete games.
 - [ ] Verify 4096-byte main.py, per-file limits and total snapshot limit on the exact final commit.
 
@@ -100,3 +100,5 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - At deadline, submit the strongest eligible verified version even if optimization targets remain unfinished.
 
 - Authoritative legal-reply comparison passed on both candidates, run 44899408505. Broader castling-rights and repeated-position search tests remain open.
+
+- Seeded randomized midgame legal-reply differential suite passed on both candidates, run 44899571298. This does not establish complete search-state correctness.
