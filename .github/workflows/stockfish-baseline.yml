@@ -79,6 +79,7 @@ jobs:
                  board.push_uci(u);metrics['moves']+=1
                  if not board.is_game_over(claim_draw=True) and board.fullmove_number<=61:stock_move()
                  response=state()
+                 if response['status']=='your_move':request_time[0]=time.monotonic()
                else:
                 self.send_error(404);return
               payload=json.dumps(response).encode()
