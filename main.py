@@ -33,7 +33,7 @@ def attacks(b,w):
     xx+=dx;yy+=dy
  return a
 def score(b,w):
- own=attacks(b,w);opp=attacks(b,not w);v=0
+ own=attacks(b,w);opp=attacks(b,not w);v=2*(len(own)-len(opp))
  for i,p in enumerate(b):
   if p=='K' or p=='k':
    friendly=p.isupper()==w
