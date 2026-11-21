@@ -68,14 +68,15 @@ def search(b,w,us,d,lo,hi):
  global nodes
  nodes+=1
  if nodes>12000:raise TimeoutError
- if not d:return score(b,us)
+ if d<0:return score(b,us)
  found=0
  for n in replies(b,w):
+  if not d and n.count('.')<=b.count('.'):continue
   found=1;v=search(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not found:return (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
+ if not found:return score(b,us) if not d else (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
  return lo if w==us else hi
 def main():
  global nodes
@@ -102,4 +103,4 @@ def main():
      m=chosen
     except TimeoutError:break
    s=post('/move',{'game':s['game'],'move':m})
-if __name__=='__main__':main()
+main()
