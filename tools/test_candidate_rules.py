@@ -45,7 +45,24 @@ def main():
         for next_board in candidate.replies(candidate.board(fen), b.turn):
             king = next_board.index("K" if b.turn else "k")
             assert king not in candidate.attacks(next_board, not b.turn)
-    print("Candidate board-state and king-safety regression checks passed")
+    # Validate all generated replies against the authoritative legal board states.
+    # Exclude positions with castling rights: candidate.replies does not model castling.
+    for fen in [
+        chess.STARTING_FEN,
+        "4k3/8/8/8/8/8/4r3/4K3 w - - 0 1",
+        "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+        "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1",
+        "4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1",
+    ]:
+        b=chess.Board(fen)
+        ep=candidate.sq(chess.square_name(b.ep_square)) if b.ep_square is not None else -1
+        actual={"".join(x) for x in candidate.replies(candidate.board(fen),b.turn,ep)}
+        expected=set()
+        for m in b.legal_moves:
+            n=b.copy();n.push(m)
+            expected.add("".join(candidate.board(n.fen())))
+        assert actual==expected,(fen,len(actual),len(expected),len(actual^expected))
+    print("Candidate board-state, legal-reply and king-safety regression checks passed")
 
 
 if __name__ == "__main__":
