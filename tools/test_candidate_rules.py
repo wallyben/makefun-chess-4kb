@@ -32,6 +32,9 @@ def main():
     check("4k3/8/8/8/3Pp3/8/8/4K3 b - d3 0 1", "e4d3")
     check("4k3/P7/8/8/8/8/8/4K3 w - - 0 1", "a7a8q")
     check("4k3/8/8/8/8/8/p7/4K3 b - - 0 1", "a2a1q")
+    for promotion in "rbn":
+        check("4k3/P7/8/8/8/8/8/4K3 w - - 0 1", "a7a8"+promotion)
+        check("4k3/8/8/8/8/8/p7/4K3 b - - 0 1", "a2a1"+promotion)
     # The move generator must never yield positions exposing its own king.
     for fen in [
         "4k3/8/8/8/8/8/4r3/4K3 w - - 0 1",
