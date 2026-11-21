@@ -17,7 +17,7 @@ def move(b,m):
  if p.lower()=='k' and abs(i-j)==2:
   r=i+3 if j>i else i-4;t=i+1 if j>i else i-1;n[t]=n[r];n[r]='.'
  return n
-def attacks(b,w):
+def atk(b,w):
  a=set()
  for i,p in enumerate(b):
   if p=='.' or p.isupper()!=w:continue
@@ -32,7 +32,7 @@ def attacks(b,w):
     if t in 'pnk' or b[j]!='.':break
     xx+=dx;yy+=dy
  return a
-def score(b,w):
+def val(b,w):
  v=0
  for i,p in enumerate(b):
   if p=='.':continue
@@ -41,7 +41,7 @@ def score(b,w):
   bonus=((6-y if p.isupper() else y-1)*9 if t=='p' else c*8 if t in 'nb' else c*3 if t in 'rq' else 0)
   v+=(V[t]+bonus)*(1 if f else -1)
  return v
-def replies(b,w,ep=-1):
+def gen(b,w,ep=-1):
  for i,p in enumerate(b):
   if p=='.' or p.isupper()!=w:continue
   t=p.lower();x=i%8;y=i//8
@@ -61,27 +61,28 @@ def replies(b,w,ep=-1):
       n=b[:];n[i]='.';n[j]=p
       if t=='p' and j==ep and q=='.':n[j+(8 if w else -8)]='.'
       if t=='p' and yy==(0 if w else 7):n[j]='Q' if w else 'q'
-      if n.index('K' if w else 'k') not in attacks(n,not w):yield n
+      if n.index('K' if w else 'k') not in atk(n,not w):yield n
     if q!='.' or t in 'pnk':break
     xx+=dx;yy+=dy
-def search(b,w,us,d,lo,hi):
+def srch(b,w,us,d,lo,hi):
  global nodes
  nodes+=1
  if nodes>12000:raise TimeoutError
- if d<0:return score(b,us)
- if not d:
-  v=score(b,us)
+ if d<0:return val(b,us)
+ ck=b.index('K' if w else 'k') in atk(b,not w)
+ if not d and not ck:
+  v=val(b,us)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:return v
  fd=0
- for n in replies(b,w):
-  if not d and n.count('.')<=b.count('.'):continue
-  fd=1;v=search(n,not w,us,d-1,lo,hi)
+ for n in gen(b,w):
+  if not d and not ck and n.count('.')<=b.count('.'):continue
+  fd=1;v=srch(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
   if lo>=hi:break
- if not fd:return v if not d else (-90000 if w==us else 90000) if b.index('K' if w else 'k') in attacks(b,not w) else 0
+ if not fd:return v if not d and not ck else (-90000 if w==us else 90000) if ck else 0
  return lo if w==us else hi
 def main():
  global nodes
@@ -100,10 +101,10 @@ def main():
       n=move(b,q);e=-1
       if b[sq(q[:2])].lower()=='p' and abs(sq(q[:2])-sq(q[2:4]))==16:e=(sq(q[:2])+sq(q[2:4]))//2
       a=99999;fd=0
-      for r in replies(n,not w,e):
-       fd=1;a=min(a,search(r,w,w,depth-1,best,a))
+      for r in gen(n,not w,e):
+       fd=1;a=min(a,srch(r,w,w,depth-1,best,a))
        if a<=best:break
-      if not fd:a=100000 if n.index('k' if w else 'K') in attacks(n,w) else 0
+      if not fd:a=100000 if n.index('k' if w else 'K') in atk(n,w) else 0
       if a>best:best=a;ch=q
      m=ch
     except TimeoutError:break
