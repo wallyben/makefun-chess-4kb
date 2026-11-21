@@ -81,7 +81,15 @@ def main():
                 n=b.copy();n.push(m)
                 expected.add("".join(candidate.board(n.fen())))
             assert actual==expected,(game,ply,b.fen(),len(actual),len(expected),len(actual^expected))
-    print("Candidate board-state, legal-reply and king-safety regression checks passed")
+    # A candidate must never claim a checkmated position has legal evasions.
+    for fen in [
+        "7k/6Q1/6K1/8/8/8/8/8 b - - 0 1",
+        "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+    ]:
+        position=chess.Board(fen)
+        assert position.is_checkmate() or position.is_stalemate()
+        assert not list(candidate.replies(candidate.board(fen),position.turn)),fen
+    print("Candidate board-state, legal-reply, terminal-state and king-safety regression checks passed")
 
 
 if __name__ == "__main__":
