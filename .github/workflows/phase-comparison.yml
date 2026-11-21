@@ -1,4 +1,4 @@
-name: Search budget and evaluation controlled 300-game comparison
+name: Search budget and evaluation controlled 400-game comparison
 on:
   pull_request:
     paths:
@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         shard: [0,1,2,3,4,5,6,7,8,9]
-        candidate: [experiment/mate-terminal-20261121, experiment/phase-eval-20261121, experiment/nodes-30000-20261121]
+        candidate: [experiment/mate-terminal-20261121, experiment/phase-eval-20261121, experiment/nodes-30000-20261121, experiment/quiescence-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -25,7 +25,7 @@ jobs:
           python -m pip install 'python-chess==1.999'
       - name: Fetch exact isolated competition candidate
         run: |
-          git fetch origin experiment/mate-terminal-20261121 experiment/phase-eval-20261121 experiment/nodes-30000-20261121
+          git fetch origin experiment/mate-terminal-20261121 experiment/phase-eval-20261121 experiment/nodes-30000-20261121 experiment/quiescence-20261121
           git show origin/${{ matrix.candidate }}:main.py > /tmp/tiny_chess_candidate.py
           python - <<'PY'
           import pathlib,ast
