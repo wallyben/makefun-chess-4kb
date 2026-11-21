@@ -1,8 +1,5 @@
 name: Official Tiny Chess kit audit
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/official-kit-audit.yml'
   workflow_dispatch:
 jobs:
   audit:
