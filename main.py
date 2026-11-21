@@ -70,7 +70,7 @@ def search(b,w,us,d,lo,hi):
  if nodes>12000:raise TimeoutError
  if not d:return score(b,us)
  found=0
- for n in sorted(replies(b,w),key=lambda n:score(n,w),reverse=True):
+ for n in replies(b,w):
   found=1;v=search(n,not w,us,d-1,lo,hi)
   if w==us:lo=max(lo,v)
   else:hi=min(hi,v)
