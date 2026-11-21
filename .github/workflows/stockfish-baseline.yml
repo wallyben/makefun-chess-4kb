@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        candidate: [submission-minimal, experiment/mobility-eval-20261121, experiment/tactical-extension-20261121]
+        candidate: [submission-minimal, experiment/mobility-eval-20261121, experiment/tactical-extension-20261121, experiment/alphabeta-20261121]
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -43,7 +43,7 @@ jobs:
           stock.configure({'UCI_LimitStrength':True,'UCI_Elo':1320,'Threads':1,'Hash':16})
           results=[]
           try:
-           for game_no in range(8 if '${{ matrix.candidate }}' == 'experiment/tactical-extension-20261121' else 20):
+           for game_no in range(8 if '${{ matrix.candidate }}' == 'experiment/tactical-extension-20261121' else 8 if '${{ matrix.candidate }}' == 'experiment/alphabeta-20261121' else 20):
             our_white=game_no%2==0
             board=chess.Board()
             # Matched openings: same deterministic prefix in both colours.
