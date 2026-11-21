@@ -1,4 +1,4 @@
-import os,json,urllib.request,time
+import os,json,urllib.request
 U=os.environ['MAKEFUN_ENV_URL'].rstrip('/')
 V=dict(zip('pnbrqk',(100,320,330,500,900,0)))
 def post(p,d):
@@ -66,7 +66,9 @@ def replies(b,w,ep=-1):
     if q!='.' or t in 'pnk':break
     xx+=dx;yy+=dy
 def search(b,w,us,d,lo,hi):
- if time.monotonic()>end:raise TimeoutError
+ global nodes
+ nodes+=1
+ if nodes>3000:raise TimeoutError
  if not d:return score(b,us)
  found=0
  for n in replies(b,w):
@@ -77,7 +79,7 @@ def search(b,w,us,d,lo,hi):
  if not found:return 0
  return lo if w==us else hi
 def main():
- global end
+ global nodes
  while 1:
   s=post('/game',{})
   if s.get('status')=='done':return
@@ -85,7 +87,7 @@ def main():
    legal=s['legal_moves']
    if not legal:break
    b=board(s['fen']);w=s['fen'].split()[1]=='w';m=sorted(legal)[0]
-   end=time.monotonic()+2
+   nodes=0
    for depth in (1,2):
     best=-99999;chosen=m
     try:
