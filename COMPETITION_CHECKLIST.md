@@ -120,3 +120,14 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - Created isolated `experiment/fixed-node-deeper-20261121` commit `98164037` from fixed-node baseline: fixed node budget 3000 -> 12000, iterative depth attempts (1,2) -> (1,2,3). `main.py` remains 4092 ASCII bytes. No clock-based search.
 - Added candidate to Stockfish and rules matrices (commits 5079e78, 4069979). Pending: full Python 3.13 legality CI, no illegal moves/crashes, per-move latency below 10s, strength versus incumbent and fixed-node baseline.
 - WARNING: additional depth and node budget are a hypothesis, NOT measured Elo gain; do not promote without evidence.
+
+## 2026-11-21 ordered-search implementation gate
+- [x] Implement experimental legal-move ordering and checkmate/stalemate terminal evaluation in isolated `experiment/ordered-search-20261121`, commit `4af82a3` (exactly 4096 bytes, deterministic 12000-node cap).
+- [x] Register challenger in legality and Stockfish CI matrices (commits `01dca22`, `24bd304`).
+- [ ] Verify candidate passes CI rules and 10s/move game runtime.
+- [ ] Prove actual strength gain versus `experiment/fixed-node-deeper-20261121` and incumbent; reject otherwise.
+- [ ] Implement bounded quiescence search under size/runtime constraints.
+- [ ] Implement safe compact transposition table, if justified by measured benefit.
+- [ ] Implement safe late-move reductions, if justified by measured benefit.
+- [ ] Restore or improve tactical/positional evaluation without sacrificing stronger search.
+- Note: To fit the 4096-byte cap the prototype removes attacked-piece penalty and simplifies center scoring; these are possible regressions. Move ordering by full position evaluation may cost substantial CPU; no Elo claim before tests.
