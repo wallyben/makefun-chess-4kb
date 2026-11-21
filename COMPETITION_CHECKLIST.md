@@ -185,3 +185,9 @@ These tasks supplement the eligibility and submission gates above. A checked imp
 - [ ] Run official kit quality gates, paired benchmarks against house Sunfish and current mate-terminal candidate, and official practice trial before any promotion.
 - [ ] Explore Stockfish teacher-guided tuning offline only; preserve legal and technical compliance.
 - [ ] Promote only measured improvement over proven baseline, rather than inventing unvalidated chess algorithms.
+
+## Sunfish implementation kickoff — verified upstream limitation
+- [x] Created isolated `experiment/sunfish-nnue-20261121` branch, source/licensing integration manifest commit `3e68527`.
+- [x] Verified upstream NNUE README says shipped neural net is 7.5 MB and **not** 4KB compliant. Official house uses a separately adapted/packed Sunfish derivative (reported 3649 bytes). Do not confuse the two.
+- [ ] Obtain exact official house artifact and adapt legally under Python 3.13, deterministic fixed nodes, 4096-byte cap, GPL source bundle/transcript requirements.
+- [ ] Implement and benchmark real Sunfish-based executable; current integration branch is documentation only, not a playable engine.
