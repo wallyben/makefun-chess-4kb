@@ -204,3 +204,11 @@ Baseline: protected submission-minimal ca334ddb (main.py 3790 B; snapshot 4857 B
 - [ ] Generate offline prepared opening responses for all published practice openings/house engines, with a legal fallback for unseen positions; prohibit external model calls or runtime files.
 - [ ] Run color-swapped opening-paired tournaments and official six-gauntlet simulations; include censoring, variance/uncertainty, worst-case <10s and 8192-byte repo cap.
 - [ ] Verify official practice score >=1154 and independently beat house Sunfish baseline; freeze 24h before Nov 24 17:00 UTC deadline.
+
+## 2026-11-21 execution of source-backed plan
+- [x] Fixed official kit audit to distinguish starter (2996 bytes) from unavailable outer-kit house Sunfish; extract RULES.txt, kit.json, scorer, calibration, server and nested harness inventory; commit `e9a3057`.
+- [x] Created isolated playable phase-sensitive evaluation experiment `experiment/phase-eval-20261121`, commit `b83b439`, 4086 bytes, deterministic 12000-node search. This is a limited evaluation ablation, NOT a full PeSTO/PVS implementation.
+- [x] Registered phase-eval candidate in rules and Stockfish CI matrices; commits `ae2ba8d` and `013d7e7`.
+- [ ] Inspect nested harness and official scorer; identify reproducible house engines, verify kit protocol and scoring locally.
+- [ ] Implement proven PVS/quiescence/TT architecture or legally adapted classic Sunfish within 4096 bytes and 8192-byte snapshot; test independently before promotion.
+- [ ] Await phase-eval benchmark and reject if no credible improvement.
