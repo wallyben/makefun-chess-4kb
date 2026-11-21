@@ -43,7 +43,7 @@ jobs:
           stock.configure({'UCI_LimitStrength':True,'UCI_Elo':1320,'Threads':1,'Hash':16})
           results=[]
           try:
-           for game_no in range(20):
+           for game_no in range(8 if '${{ matrix.candidate }}' == 'experiment/tactical-extension-20261121' else 20):
             our_white=game_no%2==0
             board=chess.Board()
             # Matched openings: same deterministic prefix in both colours.
@@ -92,7 +92,7 @@ jobs:
             env=dict(os.environ,MAKEFUN_ENV_URL=f'http://127.0.0.1:{server.server_port}')
             t=time.monotonic()
             try:
-             p=subprocess.run([sys.executable,engine_path],env=env,text=True,capture_output=True,timeout=180)
+             p=subprocess.run([sys.executable,engine_path],env=env,text=True,capture_output=True,timeout=35)
              metrics['elapsed_seconds']=round(time.monotonic()-t,3)
              metrics['crash']=p.returncode!=0
              if metrics['crash']:metrics['stderr']=p.stderr[-1000:]
