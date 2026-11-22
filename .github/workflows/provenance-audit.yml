@@ -1,0 +1,47 @@
+name: Competition provenance and eligibility audit
+on:
+  push:
+    branches: [experiment/public-engine-reproduction-20261122]
+    paths: ['.github/workflows/provenance-audit.yml']
+  workflow_dispatch:
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect exact official kit and public-source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://make.fun/c/tiny-chess-01/kit -o /tmp/kit.tar.gz
+          mkdir -p /tmp/kit
+          tar -xzf /tmp/kit.tar.gz -C /tmp/kit
+          K=/tmp/kit/tiny-chess-01-kit
+          curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/LICENSE -o /tmp/public-LICENSE
+          curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/README.md -o /tmp/public-README
+          echo 'OFFICIAL_RULES'
+          cat "$K/RULES.txt"
+          echo 'OFFICIAL_COMPETITION_CONFIG'
+          cat "$K/competition.yaml"
+          echo 'OFFICIAL_KIT_METADATA'
+          cat "$K/kit.json"
+          echo 'PUBLIC_LICENSE'
+          cat /tmp/public-LICENSE
+          echo 'PUBLIC_README'
+          head -100 /tmp/public-README
+          echo 'OWN_REPO_LICENSE'
+          cat LICENSE
+          echo 'CURRENT_SOURCE_SIZE'
+          wc -c main.py
+          echo 'PUBLIC_SOURCE_COMMIT'
+          curl -fLsS -H 'Accept: application/vnd.github+json' https://api.github.com/repos/Xyzar29/tiny-chess/commits/main | python -c 'import json,sys; x=json.load(sys.stdin);print(x.get("sha"),x.get("commit",{}).get("message","")[:120])'
+          echo 'REPO_TREE_BYTES'
+          find . -type f -not -path './.git/*' -printf '%s %p\\n' | sort -nr | head -35
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: provenance-audit-evidence
+          path: |
+            LICENSE
+            COMPETITION_EXECUTION_LOCK.md
