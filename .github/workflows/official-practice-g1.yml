@@ -111,6 +111,35 @@ jobs:
           print('OFFICIAL_SCORER_OUTPUT',json.dumps(s,sort_keys=True))
           assert isinstance(s.get('elo'),(int,float))
           PY
+      - name: Replay identical trial and verify byte-for-byte deterministic state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/chess-replay-state
+          MAKEFUN_ENV_DATA_DIR=/tmp/gauntlet MAKEFUN_STATE_DIR=/tmp/chess-replay-state MAKEFUN_ENV_PORT=18081 node "$OFFICIAL_SERVER" > official-replay-server.log 2>&1 &
+          replay_pid=$!
+          trap 'kill "$replay_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 40); do
+            if [ -f /tmp/chess-replay-state/ready ]; then break; fi
+            if ! kill -0 "$replay_pid" 2>/dev/null; then cat official-replay-server.log; exit 1; fi
+            sleep 0.5
+          done
+          test -f /tmp/chess-replay-state/ready
+          MAKEFUN_ENV_URL=http://127.0.0.1:18081 timeout 1000s python main.py > official-replay-entry.log 2>&1 || echo "REPLAY_ENTRY_EXIT_CODE=$?"
+          kill -TERM "$replay_pid" 2>/dev/null || true
+          wait "$replay_pid" 2>/dev/null || true
+          test -s /tmp/chess-replay-state/export/state.json
+          cp /tmp/chess-replay-state/export/state.json official-replay-state.json
+          python - <<'PY'
+          import json,hashlib
+          a=open('official-state.json','rb').read()
+          b=open('official-replay-state.json','rb').read()
+          for name,raw in [('original',a),('replay',b)]:
+            s=json.loads(raw)
+            print(name,'sha256',hashlib.sha256(raw).hexdigest(),'games',[(g['opponent'],g['outcome']) for g in s['games']])
+          assert a==b,'NONDETERMINISTIC: official state JSON differs on identical trial replay'
+          print('REPLAY_BYTE_IDENTICAL=PASS')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -122,5 +151,8 @@ jobs:
             official-calls.ndjson
             official-entry.log
             public-engine-LICENSE
+            official-replay-state.json
+            official-replay-entry.log
+            official-replay-server.log
             official-server.log
             entry-exit.txt
