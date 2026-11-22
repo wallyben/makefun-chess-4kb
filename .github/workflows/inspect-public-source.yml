@@ -21,9 +21,11 @@ jobs:
           print('PUBLIC_SOURCE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
           print('RAW_PREFIX',repr(p.read_bytes()[:180]))
           tree=ast.parse(src)
+          print('AST_PREFIX',ast.dump(tree,include_attributes=False)[:700])
           for node in ast.walk(tree):
            if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr=='decompress':
             for arg in node.args:
+              print('DECOMPRESS_ARG',ast.dump(arg,include_attributes=False)[:400])
              try:
               v=ast.literal_eval(arg)
               if isinstance(v,str):v=v.encode('latin-1')
