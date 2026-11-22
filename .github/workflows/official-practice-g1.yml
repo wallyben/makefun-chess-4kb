@@ -49,9 +49,19 @@ jobs:
           test -f /tmp/chess-state/ready
           cat /tmp/chess-state/ready
           MAKEFUN_ENV_URL=http://127.0.0.1:18080 timeout 1780s python main.py > official-entry.log 2>&1 || echo "ENTRY_EXIT_CODE=$?" | tee entry-exit.txt
+          cp /tmp/chess-state/calls.ndjson official-calls.ndjson 2>/dev/null || true
           echo 'ENTRY LOG'; tail -35 official-entry.log || true
           echo 'SERVER LOG'; tail -80 official-server.log || true
           echo 'STATE FILES'; find /tmp/chess-state -maxdepth 4 -type f -printf '%p %s bytes\n' | sort | head -100
+          echo 'CALL TRACE SUMMARY'; python - <<'PY'
+          import json,pathlib,collections
+          p=pathlib.Path('official-calls.ndjson')
+          if p.exists():
+           lines=p.read_text().splitlines(); print('CALL_COUNT',len(lines))
+           for line in (lines[:2]+lines[-8:]):
+            try: print(json.dumps(json.loads(line))[:1100])
+            except Exception: print(line[:1100])
+          PY
           echo 'STATE JSON CANDIDATES'; find /tmp/chess-state -maxdepth 4 -type f \( -name '*.json' -o -name '*.ndjson' \) -print | head -30
           python - <<'PY'
           import json,pathlib,collections
