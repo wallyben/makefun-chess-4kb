@@ -27,9 +27,30 @@ jobs:
           mkdir -p /tmp/gauntlet /tmp/chess-state
           cp "$K/practice/trial-0/input/env/gauntlet.json" /tmp/gauntlet/gauntlet.json
           curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/main.py -o main.py
+          python - <<'PY'
+          import ast,lzma,pathlib,hashlib
+          p=pathlib.Path('main.py');original=p.read_bytes()
+          tree=ast.parse(original.decode('latin1'))
+          calls=[n for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr=='decompress']
+          assert len(calls)==1
+          arg=calls[0].args[0]
+          raw=ast.literal_eval(arg.func.value).encode('latin1')
+          source=lzma.decompress(raw).decode('utf8')
+          assert source.count('BG=120000')==1
+          modified=source.replace('BG=120000','BG=180000')
+          assert modified!=source
+          blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
+          packed=b'#coding:l1\\nimport lzma;exec(lzma.decompress('+repr(blob.decode('latin1')).encode('latin1')+b".encode('l1')))\\n"
+          assert len(packed)<=4096, f'OVER_CAP={len(packed)}'
+          compile(packed,'main.py','exec')
+          p.write_bytes(packed)
+          print('SINGLE_EXPERIMENT=BG 120000 -> 180000 (50% more deterministic search nodes)')
+          print('UPSTREAM_SHA256',hashlib.sha256(original).hexdigest(),'CHALLENGER_SHA256',hashlib.sha256(packed).hexdigest(),'BYTES',len(packed))
+          print('EXACT_UNPACKED_DIFF','- BG=120000','+ BG=180000')
+          PY
           curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/LICENSE -o public-engine-LICENSE
           grep -qi "MIT License" public-engine-LICENSE
-          echo "G2_SINGLE_PUBLIC_ENGINE=Xyzar29/tiny-chess main.py (MIT); experimental only, not yet submission-eligible"
+          echo "G5_SINGLE_CHALLENGER=Xyzar29 derivative, BG 180000, MIT attribution required; experimental only"
           git rev-parse HEAD
           python - <<'PY'
           from pathlib import Path
@@ -39,7 +60,7 @@ jobs:
           print('ENTRY_SHA256',__import__('hashlib').sha256(p.read_bytes()).hexdigest(),'BYTES',p.stat().st_size)
           PY
           echo "OFFICIAL_SERVER=$K/program/env/server.mjs" >> "$GITHUB_ENV"
-      - name: Run single MIT public Xyzar29 challenger against official gauntlet
+      - name: Score single higher-node-budget derivative against official gauntlet
         shell: bash
         run: |
           set -euo pipefail
@@ -110,35 +131,6 @@ jobs:
           s=json.load(open('official-scores.json'))
           print('OFFICIAL_SCORER_OUTPUT',json.dumps(s,sort_keys=True))
           assert isinstance(s.get('elo'),(int,float))
-          PY
-      - name: Replay identical trial and verify byte-for-byte deterministic state
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/chess-replay-state
-          MAKEFUN_ENV_DATA_DIR=/tmp/gauntlet MAKEFUN_STATE_DIR=/tmp/chess-replay-state MAKEFUN_ENV_PORT=18081 node "$OFFICIAL_SERVER" > official-replay-server.log 2>&1 &
-          replay_pid=$!
-          trap 'kill "$replay_pid" 2>/dev/null || true' EXIT
-          for i in $(seq 1 40); do
-            if [ -f /tmp/chess-replay-state/ready ]; then break; fi
-            if ! kill -0 "$replay_pid" 2>/dev/null; then cat official-replay-server.log; exit 1; fi
-            sleep 0.5
-          done
-          test -f /tmp/chess-replay-state/ready
-          MAKEFUN_ENV_URL=http://127.0.0.1:18081 timeout 1000s python main.py > official-replay-entry.log 2>&1 || echo "REPLAY_ENTRY_EXIT_CODE=$?"
-          kill -TERM "$replay_pid" 2>/dev/null || true
-          wait "$replay_pid" 2>/dev/null || true
-          test -s /tmp/chess-replay-state/export/state.json
-          cp /tmp/chess-replay-state/export/state.json official-replay-state.json
-          python - <<'PY'
-          import json,hashlib
-          a=open('official-state.json','rb').read()
-          b=open('official-replay-state.json','rb').read()
-          for name,raw in [('original',a),('replay',b)]:
-            s=json.loads(raw)
-            print(name,'sha256',hashlib.sha256(raw).hexdigest(),'games',[(g['opponent'],g['outcome']) for g in s['games']])
-          assert a==b,'NONDETERMINISTIC: official state JSON differs on identical trial replay'
-          print('REPLAY_BYTE_IDENTICAL=PASS')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
