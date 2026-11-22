@@ -49,6 +49,20 @@ jobs:
           test -f /tmp/chess-state/ready
           cat /tmp/chess-state/ready
           MAKEFUN_ENV_URL=http://127.0.0.1:18080 timeout 1780s python main.py > official-entry.log 2>&1 || echo "ENTRY_EXIT_CODE=$?" | tee entry-exit.txt
+          echo 'POST-ENTRY SERVER LIFECYCLE'
+          if kill -0 "$server_pid" 2>/dev/null; then
+            echo 'SERVER_ALIVE_AFTER_ENTRY=1'
+            kill -TERM "$server_pid" 2>/dev/null || true
+            for i in $(seq 1 30); do
+              if ! kill -0 "$server_pid" 2>/dev/null; then break; fi
+              sleep 0.2
+            done
+            wait "$server_pid" 2>/dev/null || true
+          else
+            echo 'SERVER_ALIVE_AFTER_ENTRY=0'
+          fi
+          echo 'EXPORT_AFTER_SERVER_SHUTDOWN'
+          find /tmp/chess-state -maxdepth 4 -type f -printf '%p %s bytes\\n' | sort
           cp /tmp/chess-state/calls.ndjson official-calls.ndjson 2>/dev/null || true
           echo 'ENTRY LOG'; tail -35 official-entry.log || true
           echo 'SERVER LOG'; tail -80 official-server.log || true
