@@ -1,0 +1,73 @@
+name: Official house practice G1
+on:
+  push:
+    branches: [experiment/public-engine-reproduction-20261122]
+    paths: ['.github/workflows/official-practice-g1.yml']
+  workflow_dispatch:
+jobs:
+  practice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - name: Download exact official practice environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://make.fun/c/tiny-chess-01/kit -o /tmp/kit.tar.gz
+          mkdir -p /tmp/kit
+          tar -xzf /tmp/kit.tar.gz -C /tmp/kit
+          K=/tmp/kit/tiny-chess-01-kit
+          mkdir -p /tmp/gauntlet /tmp/chess-state
+          cp "$K/practice/trial-0/input/env/gauntlet.json" /tmp/gauntlet/gauntlet.json
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('main.py')
+          assert p.stat().st_size<=4096
+          compile(p.read_bytes(),str(p),'exec')
+          print('ENTRY_SHA256',__import__('hashlib').sha256(p.read_bytes()).hexdigest(),'BYTES',p.stat().st_size)
+          PY
+          echo "OFFICIAL_SERVER=$K/program/env/server.mjs" >> "$GITHUB_ENV"
+      - name: Run PV-first against actual six-game official practice gauntlet
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAKEFUN_ENV_DATA_DIR=/tmp/gauntlet MAKEFUN_STATE_DIR=/tmp/chess-state MAKEFUN_ENV_PORT=18080 node "$OFFICIAL_SERVER" > official-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 40); do
+            if [ -f /tmp/chess-state/ready ]; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat official-server.log; exit 1; fi
+            sleep 0.5
+          done
+          test -f /tmp/chess-state/ready
+          cat /tmp/chess-state/ready
+          MAKEFUN_ENV_URL=http://127.0.0.1:18080 timeout 1780s python main.py > official-entry.log 2>&1 || echo "ENTRY_EXIT_CODE=$?" | tee entry-exit.txt
+          cat official-entry.log | tail -35
+          python - <<'PY'
+          import json,pathlib,collections
+          p=pathlib.Path('/tmp/chess-state/export/state.json')
+          if not p.exists():print('BLOCK: no official state export');raise SystemExit(2)
+          s=json.loads(p.read_text());print('OFFICIAL_STATE',json.dumps(s)[:15000])
+          print('RESULT_TYPES',type(s).__name__)
+          PY
+          cp /tmp/chess-state/export/state.json official-state.json
+          cp /tmp/chess-state/export/transcript.ndjson official-transcript.ndjson
+          cp /tmp/chess-state/calls.ndjson official-calls.ndjson
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-practice-g1-evidence
+          path: |
+            official-state.json
+            official-transcript.ndjson
+            official-calls.ndjson
+            official-entry.log
+            official-server.log
+            entry-exit.txt
