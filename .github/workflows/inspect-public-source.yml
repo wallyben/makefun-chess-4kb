@@ -26,6 +26,7 @@ jobs:
             for arg in node.args:
              try:
               v=ast.literal_eval(arg)
+              if isinstance(v,str):v=v.encode('latin-1')
               if isinstance(v,(bytes,bytearray)):
                unpack=lzma.decompress(v).decode()
                print('UNPACKED_SOURCE_BEGIN',len(unpack.encode()))
