@@ -26,10 +26,11 @@ jobs:
           K=/tmp/kit/tiny-chess-01-kit
           mkdir -p /tmp/gauntlet /tmp/chess-state
           cp "$K/practice/trial-0/input/env/gauntlet.json" /tmp/gauntlet/gauntlet.json
-          git fetch --no-tags --depth=1 origin experiment/mate-terminal-20261121
-          git show FETCH_HEAD:main.py > main.py
-          echo 'G2_SINGLE_MATE_TERMINAL=experiment/mate-terminal-20261121'
-          git rev-parse FETCH_HEAD
+          curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/main.py -o main.py
+          curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/LICENSE -o public-engine-LICENSE
+          grep -qi "MIT License" public-engine-LICENSE
+          echo "G2_SINGLE_PUBLIC_ENGINE=Xyzar29/tiny-chess main.py (MIT); experimental only, not yet submission-eligible"
+          git rev-parse HEAD
           python - <<'PY'
           from pathlib import Path
           p=Path('main.py')
@@ -38,7 +39,7 @@ jobs:
           print('ENTRY_SHA256',__import__('hashlib').sha256(p.read_bytes()).hexdigest(),'BYTES',p.stat().st_size)
           PY
           echo "OFFICIAL_SERVER=$K/program/env/server.mjs" >> "$GITHUB_ENV"
-      - name: Run single existing mate-terminal challenger against official gauntlet
+      - name: Run single MIT public Xyzar29 challenger against official gauntlet
         shell: bash
         run: |
           set -euo pipefail
@@ -120,5 +121,6 @@ jobs:
             official-transcript.ndjson
             official-calls.ndjson
             official-entry.log
+            public-engine-LICENSE
             official-server.log
             entry-exit.txt
