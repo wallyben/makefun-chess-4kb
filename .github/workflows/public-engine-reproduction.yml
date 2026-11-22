@@ -36,7 +36,7 @@ jobs:
           import pathlib,ast
           p=pathlib.Path('/tmp/tiny_chess_candidate.py')
           assert p.stat().st_size<=4096
-          ast.parse(p.read_text())
+          compile(p.read_bytes(),str(p),'exec')
           print('candidate_bytes',p.stat().st_size)
           PY
       - name: Paired colour Stockfish baseline (no official Elo claim)
