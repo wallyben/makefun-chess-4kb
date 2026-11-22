@@ -37,6 +37,12 @@ jobs:
           for f in Path('official-kit-files.txt').read_text().splitlines():
             if re.search('readme|practice|trial|harness|main.py|script|package.json|run|submit|score',f,re.I):print(f)
           PY
+          echo '=== OFFICIAL SERVER STARTUP ==='
+          sed -n '2050,2090p' "$K/program/env/server.mjs"
+          echo '=== OFFICIAL STARTER README ==='
+          cat "$K/starter/README.md"
+          echo '=== OFFICIAL GAUNTLET 0 ==='
+          cat "$K/practice/trial-0/input/env/gauntlet.json"
           cp "$K/RULES.txt" official-RULES.txt
           cp "$K/kit.json" official-kit.json
           cp "$K/program/scorer/score.mjs" official-score.mjs
