@@ -26,6 +26,13 @@ jobs:
           K=/tmp/kit/tiny-chess-01-kit
           mkdir -p /tmp/gauntlet /tmp/chess-state
           cp "$K/practice/trial-0/input/env/gauntlet.json" /tmp/gauntlet/gauntlet.json
+          echo 'OFFICIAL_GAUNTLET_PREPARED_OPENINGS_AND_VARIANTS'
+          python - <<'PYGAUNTLET'
+          import json,pathlib,hashlib
+          p=pathlib.Path('/tmp/gauntlet/gauntlet.json'); raw=p.read_bytes(); data=json.loads(raw)
+          print('GAUNTLET_SHA256',hashlib.sha256(raw).hexdigest())
+          print('GAUNTLET_JSON',json.dumps(data,sort_keys=True)[:24000])
+          PYGAUNTLET
           curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/main.py -o main.py
           python - <<'PY'
           import ast,lzma,pathlib,hashlib
