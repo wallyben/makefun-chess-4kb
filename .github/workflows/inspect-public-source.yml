@@ -27,7 +27,7 @@ jobs:
             for arg in node.args:
              print('DECOMPRESS_ARG',ast.dump(arg,include_attributes=False)[:400])
              try:
-              v=ast.literal_eval(arg)
+              v=ast.literal_eval(arg.func.value if isinstance(arg,ast.Call) and isinstance(arg.func,ast.Attribute) and arg.func.attr=='encode' else arg)
               if isinstance(v,str):v=v.encode('latin-1')
               if isinstance(v,(bytes,bytearray)):
                unpack=lzma.decompress(v).decode()
