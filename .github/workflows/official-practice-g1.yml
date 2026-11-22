@@ -40,8 +40,9 @@ jobs:
           modified=source.replace('BG=120000','BG=180000')
           assert modified!=source
           blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
-          escaped=''.join({'\\\\':'\\\\\\\\',"'":"\\\\'",'\\x00':'\\\\0','\\n':'\\\\n','\\r':'\\\\r'}.get(c,c) for c in blob.decode('latin1'))
-          packed=b'#coding:l1\\nimport lzma;exec(lzma.decompress('+ ("'"+escaped+"'").encode('latin1')+b".encode('l1')))\\n"
+          esc={0:'\0',10:'\n',13:'\r',39:"\'",92:'\\'}
+          escaped=''.join(esc.get(ord(c),c) for c in blob.decode('latin1'))
+          packed=b'#coding:l1\nimport lzma;exec(lzma.decompress('+ ("'"+escaped+"'").encode('latin1')+b".encode('l1')))\n"
           assert len(packed)<=4096, f'OVER_CAP={len(packed)}'
           compile(packed,'main.py','exec')
           p.write_bytes(packed)
