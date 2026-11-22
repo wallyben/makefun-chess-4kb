@@ -36,9 +36,32 @@ jobs:
           arg=calls[0].args[0]
           raw=ast.literal_eval(arg.func.value).encode('latin1')
           source=lzma.decompress(raw).decode('utf8')
-          assert source.count("return(1<<20)+v*16-V[o[0][i]]//16")==1
-          modified=source.replace("return(1<<20)+v*16-V[o[0][i]]//16","return(1<<20)+v*16-V[o[0][i]]*2")
+          assert source.count("  return s\n def F(fen):")==0
+          anchor="  return s\ndef F(fen):"
+          assert source.count(anchor)==1
+          # One established endgame evaluation improvement: reward genuinely passed pawns.
+          # Mailbox board uses own white pawns moving towards decreasing indices.
+          passed_eval="""  b=o[0]
+  for i in range(21,99):
+   if b[i]=='P' and not any(b[j]=='p' for j in range(21,99) if j<i and abs(j%10-i%10)<=1):s+=min(65,(9-i//10)*10)
+   if b[i]=='p' and not any(b[j]=='P' for j in range(21,99) if j>i and abs(j%10-i%10)<=1):s-=min(65,(i//10-1)*10)
+"""
+          modified=source.replace(anchor,passed_eval+anchor)
           assert modified!=source
+          # Exercise core rules on known positions before running the gauntlet.
+          ns={'__name__':'chess_validation'}
+          exec(compile(modified,'unpacked-engine.py','exec'),ns)
+          F,G,K,H=ns['F'],ns['G'],ns['K'],ns['H']
+          initial=F('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+          assert len(list(G(initial)))==20, 'INITIAL_PSEUDO_MOVES'
+          assert not H(initial),'INITIAL_CHECK'
+          assert ns['U']((85,65,''),False)=='e2e4','UCI_CONVERSION'
+          after=K(initial,(85,65,''))
+          assert after[0].count('P')==8 and after[0].count('p')==8,'PAWN_PRESERVATION'
+          assert F('8/8/8/8/8/8/4k3/4K3 w - - 0 1')[0].count('K')==1
+          assert len(modified.encode())<11000,'UNPACKED_SIZE_SANITY'
+          print('ENGINE_RULE_SMOKE_PASS', 'initial=20', 'e2e4', 'pawn-count', 'fen')
+
           blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
           esc={k:chr(92)+v for k,v in [(0,'x00'),(10,'n'),(13,'r'),(39,chr(39)),(92,chr(92))]}
           escaped=''.join(esc.get(ord(c),c) for c in blob.decode('latin1'))
@@ -50,13 +73,13 @@ jobs:
           roundtrip=ast.literal_eval(call.args[0].func.value).encode('latin1')
           assert lzma.decompress(roundtrip).decode('utf8')==modified,'PACKING_ROUNDTRIP_FAILED'
           p.write_bytes(packed)
-          print('SINGLE_EXPERIMENT=MVV-LVA capture ordering: stronger attacker-value penalty; BG remains 120000')
+          print('SINGLE_EXPERIMENT=passed-pawn evaluation, BG remains 120000')
           print('UPSTREAM_SHA256',hashlib.sha256(original).hexdigest(),'CHALLENGER_SHA256',hashlib.sha256(packed).hexdigest(),'BYTES',len(packed))
-          print('EXACT_UNPACKED_DIFF','- capture victim*16 - attacker//16','+ capture victim*16 - attacker*2')
+          print('EXACT_UNPACKED_DIFF','+ passed pawn bonuses in static evaluation; all search parameters unchanged')
           PY
           curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/LICENSE -o public-engine-LICENSE
           grep -qi "MIT License" public-engine-LICENSE
-          echo "G5_SINGLE_CHALLENGER=Xyzar29 derivative, capture ordering attacker penalty x32, BG unchanged 120000; experimental only"
+          echo "G5_SINGLE_CHALLENGER=Xyzar29 derivative, passed pawn evaluation, BG unchanged 120000; experimental only"
           git rev-parse HEAD
           python - <<'PY'
           from pathlib import Path
@@ -66,7 +89,7 @@ jobs:
           print('ENTRY_SHA256',__import__('hashlib').sha256(p.read_bytes()).hexdigest(),'BYTES',p.stat().st_size)
           PY
           echo "OFFICIAL_SERVER=$K/program/env/server.mjs" >> "$GITHUB_ENV"
-      - name: Score single capture-ordering derivative against official gauntlet
+      - name: Score single passed-pawn evaluation derivative against official gauntlet
         shell: bash
         run: |
           set -euo pipefail
