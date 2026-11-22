@@ -36,8 +36,8 @@ jobs:
           arg=calls[0].args[0]
           raw=ast.literal_eval(arg.func.value).encode('latin1')
           source=lzma.decompress(raw).decode('utf8')
-          assert source.count('BG=120000')==1
-          modified=source.replace('BG=120000','BG=180000')
+          assert source.count("return(1<<20)+v*16-V[o[0][i]]//16")==1
+          modified=source.replace("return(1<<20)+v*16-V[o[0][i]]//16","return(1<<20)+v*16-V[o[0][i]]*2")
           assert modified!=source
           blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
           esc={k:chr(92)+v for k,v in [(0,'x00'),(10,'n'),(13,'r'),(39,chr(39)),(92,chr(92))]}
@@ -50,13 +50,13 @@ jobs:
           roundtrip=ast.literal_eval(call.args[0].func.value).encode('latin1')
           assert lzma.decompress(roundtrip).decode('utf8')==modified,'PACKING_ROUNDTRIP_FAILED'
           p.write_bytes(packed)
-          print('SINGLE_EXPERIMENT=BG 120000 -> 180000 (50% more deterministic search nodes)')
+          print('SINGLE_EXPERIMENT=MVV-LVA capture ordering: stronger attacker-value penalty; BG remains 120000')
           print('UPSTREAM_SHA256',hashlib.sha256(original).hexdigest(),'CHALLENGER_SHA256',hashlib.sha256(packed).hexdigest(),'BYTES',len(packed))
-          print('EXACT_UNPACKED_DIFF','- BG=120000','+ BG=180000')
+          print('EXACT_UNPACKED_DIFF','- capture victim*16 - attacker//16','+ capture victim*16 - attacker*2')
           PY
           curl -fLsS --retry 3 https://raw.githubusercontent.com/Xyzar29/tiny-chess/main/LICENSE -o public-engine-LICENSE
           grep -qi "MIT License" public-engine-LICENSE
-          echo "G5_SINGLE_CHALLENGER=Xyzar29 derivative, BG 180000, MIT attribution required; experimental only"
+          echo "G5_SINGLE_CHALLENGER=Xyzar29 derivative, capture ordering attacker penalty x32, BG unchanged 120000; experimental only"
           git rev-parse HEAD
           python - <<'PY'
           from pathlib import Path
@@ -66,7 +66,7 @@ jobs:
           print('ENTRY_SHA256',__import__('hashlib').sha256(p.read_bytes()).hexdigest(),'BYTES',p.stat().st_size)
           PY
           echo "OFFICIAL_SERVER=$K/program/env/server.mjs" >> "$GITHUB_ENV"
-      - name: Score single higher-node-budget derivative against official gauntlet
+      - name: Score single capture-ordering derivative against official gauntlet
         shell: bash
         run: |
           set -euo pipefail
@@ -81,6 +81,7 @@ jobs:
           test -f /tmp/chess-state/ready
           cat /tmp/chess-state/ready
           MAKEFUN_ENV_URL=http://127.0.0.1:18080 timeout 1780s python main.py > official-entry.log 2>&1 || echo "ENTRY_EXIT_CODE=$?" | tee entry-exit.txt
+          test ! -f entry-exit.txt || { echo 'ENTRY_CRASH_OR_TIMEOUT'; cat entry-exit.txt; tail -30 official-entry.log; exit 1; }
           echo 'POST-ENTRY SERVER LIFECYCLE'
           if kill -0 "$server_pid" 2>/dev/null; then
             echo 'SERVER_ALIVE_AFTER_ENTRY=1'
@@ -137,6 +138,7 @@ jobs:
           s=json.load(open('official-scores.json'))
           print('OFFICIAL_SCORER_OUTPUT',json.dumps(s,sort_keys=True))
           assert isinstance(s.get('elo'),(int,float))
+          assert s.get('working')==1 and s.get('wins',0)+s.get('draws',0)+s.get('losses',0)==6, 'INCOMPLETE_OFFICIAL_GAUNTLET'
           PY
       - uses: actions/upload-artifact@v4
         if: always()
