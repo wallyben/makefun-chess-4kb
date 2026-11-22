@@ -42,3 +42,5 @@ EVIDENCE (with exact run/SHA):
 ACTION TAKEN:
 NEXT BLOCKER:
 TIME TO DEADLINE:
+
+PROVEN (2026-11-22 17:13 UTC): Single passed-pawn evaluation derivative at workflow commit af07da5ae8eed30dd06e11b9d215881f5eec1d2b, Actions run 45047003838, job 137283697600, scored with bundled official practice scorer: {wins:2,draws:2,losses:2,elo:1279,working:1,spare_plies:189}. Packed entry 3431 bytes, SHA256 09257810315d46a564ab4f811482d9104badd0c49dbbceed761c6e01d0aef786. This exceeds the 1154 numerical threshold in local official-kit reproduction but does NOT establish eligibility or hosted qualification/acceptance. Upstream reference scored 1654 (run 45039591539); derivative is weaker. Do not promote. G2 eligibility remains UNKNOWN pending authentic transcript coverage and fork provenance; avoid additional optimization while resolving gate. Protected rollback ca334ddbb43253ba84db40dbd09817be5779c39e.
