@@ -97,7 +97,7 @@ jobs:
           echo 'OFFICIAL_GAUNTLET_REFERENCE'
           find "$K/practice/trial-0" -maxdepth 5 -type f -print | sort
           mkdir -p /tmp/official-scores
-          MAKEFUN_STATE_DIR=/tmp/chess-state MAKEFUN_ENV_DATA_DIR=/tmp/gauntlet MAKEFUN_SCORES_DIR=/tmp/official-scores node "$K/program/scorer/score.mjs"
+          MAKEFUN_OUTPUT_DIR=/tmp/chess-state/export MAKEFUN_REFERENCE_DIR="$K/practice/trial-0/reference" MAKEFUN_SCORES_DIR=/tmp/official-scores node "$K/program/scorer/score.mjs"
           test -s /tmp/official-scores/scores.json
           cp /tmp/official-scores/scores.json official-scores.json
           python - <<'PY'
