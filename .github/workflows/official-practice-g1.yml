@@ -40,11 +40,15 @@ jobs:
           modified=source.replace('BG=120000','BG=180000')
           assert modified!=source
           blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
-          esc={k:chr(92)+v for k,v in [(0,'0'),(10,'n'),(13,'r'),(39,chr(39)),(92,chr(92))]}
+          esc={k:chr(92)+v for k,v in [(0,'x00'),(10,'n'),(13,'r'),(39,chr(39)),(92,chr(92))]}
           escaped=''.join(esc.get(ord(c),c) for c in blob.decode('latin1'))
           packed=b'#coding:l1\nimport lzma;exec(lzma.decompress('+ ("'"+escaped+"'").encode('latin1')+b".encode('l1')))\n"
           assert len(packed)<=4096, f'OVER_CAP={len(packed)}'
           compile(packed,'main.py','exec')
+          check=ast.parse(packed.decode('latin1'))
+          call=[n for n in ast.walk(check) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute) and n.func.attr=='decompress'][0]
+          roundtrip=ast.literal_eval(call.args[0].func.value).encode('latin1')
+          assert lzma.decompress(roundtrip).decode('utf8')==modified,'PACKING_ROUNDTRIP_FAILED'
           p.write_bytes(packed)
           print('SINGLE_EXPERIMENT=BG 120000 -> 180000 (50% more deterministic search nodes)')
           print('UPSTREAM_SHA256',hashlib.sha256(original).hexdigest(),'CHALLENGER_SHA256',hashlib.sha256(packed).hexdigest(),'BYTES',len(packed))
