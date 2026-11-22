@@ -27,7 +27,7 @@ G7. Submit before target time and verify accepted receipt, exact SHA, official s
 
 ## Evidence ledger — current
 PROVEN: PV-first smoke/regression passed; local Stockfish 1320 screening performed; Xyzar29 public engine compiled and ran six simulated games with no crashes/illegal moves, 3W 2L 1 unfinished (GitHub Actions run 44971972717).
-UNKNOWN: Official practice Elo of all current candidates, qualification, exact final release eligibility, accepted entry.
+PROVEN (2026-11-22): Official bundled scorer executed successfully for PV-first candidate on commit e85a1653102f8f0eb26674bd527077defe139a1b; Actions run 45001637940, job 137144255431: scores.json = {wins:0, draws:0, losses:6, elo:0, working:1, spare_plies:0}. Entry main.py 4092 bytes (SHA256 039fbfd3bce848bc9b36d3026c29c2841250da45ba0e0636a0d3a61dda86af5b). G1 verified; G2 fails 1154 threshold by 1154 Elo. No promotion or submission.\nUNKNOWN: Official practice Elo of other candidates, exact final release eligibility, accepted entry.
 Protected incumbent: submission-minimal at ca334ddbb43253ba84db40dbd09817be5779c39e.
 Public engine reproduction branch: experiment/public-engine-reproduction-20261122.
 
