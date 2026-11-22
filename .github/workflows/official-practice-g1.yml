@@ -49,11 +49,14 @@ jobs:
           test -f /tmp/chess-state/ready
           cat /tmp/chess-state/ready
           MAKEFUN_ENV_URL=http://127.0.0.1:18080 timeout 1780s python main.py > official-entry.log 2>&1 || echo "ENTRY_EXIT_CODE=$?" | tee entry-exit.txt
-          cat official-entry.log | tail -35
+          echo 'ENTRY LOG'; tail -35 official-entry.log || true
+          echo 'SERVER LOG'; tail -80 official-server.log || true
+          echo 'STATE FILES'; find /tmp/chess-state -maxdepth 4 -type f -printf '%p %s bytes\n' | sort | head -100
+          echo 'STATE JSON CANDIDATES'; find /tmp/chess-state -maxdepth 4 -type f \( -name '*.json' -o -name '*.ndjson' \) -print | head -30
           python - <<'PY'
           import json,pathlib,collections
           p=pathlib.Path('/tmp/chess-state/export/state.json')
-          if not p.exists():print('BLOCK: no official state export');raise SystemExit(2)
+          if not p.exists():print('BLOCK: no official state export; inspect server log and state-file inventory above');raise SystemExit(2)
           s=json.loads(p.read_text());print('OFFICIAL_STATE',json.dumps(s)[:15000])
           print('RESULT_TYPES',type(s).__name__)
           PY
