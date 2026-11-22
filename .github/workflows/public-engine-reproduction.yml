@@ -93,7 +93,7 @@ jobs:
             def state():
              if board.is_game_over(claim_draw=True) or board.fullmove_number>61 or metrics['illegal']:
               return {'status':'done'}
-             return {'status':'your_move','game':'baseline','fen':board.fen(),'legal_moves':[m.uci() for m in board.legal_moves]}
+             return {'status':'your_move','game':'baseline','fen':board.fen(),'legal_moves':[m.uci() for m in board.legal_moves],'moves':[m.uci() for m in board.move_stack],'plies':len(board.move_stack)}
             server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler)
             thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
             env=dict(os.environ,MAKEFUN_ENV_URL=f'http://127.0.0.1:{server.server_port}')
