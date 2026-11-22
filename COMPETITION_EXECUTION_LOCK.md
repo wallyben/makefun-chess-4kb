@@ -1,0 +1,39 @@
+# COMPETITION EXECUTION LOCK — Tiny Chess 4KB
+
+Status: ACTIVE. Deadline: 2026-11-24 17:00 UTC. Submission target: 2026-11-24 12:00 UTC. Feature freeze: 2026-11-23 17:00 UTC.
+
+## Single objective
+Deliver the strongest **officially scored, eligible, accepted** Tiny Chess entry. Passing CI, winning small Stockfish samples, and implementing new features are NOT success criteria.
+
+## Strict sequential gates (never skip)
+G0. Reproduce the official make.fun kit/scorer and confirm exact protocol, constraints, submission process.
+G1. Obtain official practice score for a current eligible candidate; capture run, commit SHA, W/D/L, Elo and errors.
+G2. Verify official qualification >=1154 Elo; if below, diagnose from official game evidence, not guesses.
+G3. If time allows, evaluate MIT-licensed Xyzar29 candidate under identical official conditions; preserve provenance/license.
+G4. Choose one champion plus protected fallback, based on official evidence and legality, determinism, runtime.
+G5. At most ONE targeted optimization based on measured weakness, accepted only with reproducible official improvement; revert otherwise.
+G6. Prepare minimal exact release snapshot: main.py <=4096 bytes; total <=8192 bytes; per-file limits; Python 3.13; deterministic fixed-node search; API; 10s; authentic transcripts; license; legal moves.
+G7. Submit before target time and verify accepted receipt, exact SHA, official score; fix only blocking failures.
+
+## Hard guardrails
+- Exactly ONE active candidate experiment. No concurrent benchmark matrix or duplicate Actions workflows.
+- Do not repeat Stockfish 1320 screens. No architecture rewrites, agent frameworks, or speculative feature development.
+- Never confuse a GitHub Actions success with official qualification.
+- Never overwrite submission-minimal until a validated promotion is ready; record rollback SHA.
+- If a gate is blocked, work ONLY on resolving that gate or explicitly request the missing user authorization/action.
+- Stop optional feature development at freeze time. After 2026-11-24 12:00 UTC focus on accepted submission; after 17:00 UTC stop.
+- No unverified claims. Use PROVEN / SUPPORTED / UNKNOWN labels.
+- This document and the automation prompt govern every run. Any departure needs an explicit user decision.
+
+## Evidence ledger — current
+PROVEN: PV-first smoke/regression passed; local Stockfish 1320 screening performed; Xyzar29 public engine compiled and ran six simulated games with no crashes/illegal moves, 3W 2L 1 unfinished (GitHub Actions run 44971972717).
+UNKNOWN: Official practice Elo of all current candidates, qualification, exact final release eligibility, accepted entry.
+Protected incumbent: submission-minimal at ca334ddbb43253ba84db40dbd09817be5779c39e.
+Public engine reproduction branch: experiment/public-engine-reproduction-20261122.
+
+## Mandatory run report
+CURRENT GATE:
+EVIDENCE (with exact run/SHA):
+ACTION TAKEN:
+NEXT BLOCKER:
+TIME TO DEADLINE:
