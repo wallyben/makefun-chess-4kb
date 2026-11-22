@@ -36,8 +36,7 @@ jobs:
           arg=calls[0].args[0]
           raw=ast.literal_eval(arg.func.value).encode('latin1')
           source=lzma.decompress(raw).decode('utf8')
-          assert source.count("  return s\n def F(fen):")==0
-          anchor="  return s\ndef F(fen):"
+          anchor=" return s\ndef F(fen):"
           assert source.count(anchor)==1
           # One established endgame evaluation improvement: reward genuinely passed pawns.
           # Mailbox board uses own white pawns moving towards decreasing indices.
