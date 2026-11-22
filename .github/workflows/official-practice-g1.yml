@@ -40,7 +40,7 @@ jobs:
           modified=source.replace('BG=120000','BG=180000')
           assert modified!=source
           blob=lzma.compress(modified.encode('utf8'),format=lzma.FORMAT_ALONE,preset=9)
-          esc={0:'\0',10:'\n',13:'\r',39:"\'",92:'\\'}
+          esc={k:chr(92)+v for k,v in [(0,'0'),(10,'n'),(13,'r'),(39,chr(39)),(92,chr(92))]}
           escaped=''.join(esc.get(ord(c),c) for c in blob.decode('latin1'))
           packed=b'#coding:l1\nimport lzma;exec(lzma.decompress('+ ("'"+escaped+"'").encode('latin1')+b".encode('l1')))\n"
           assert len(packed)<=4096, f'OVER_CAP={len(packed)}'
