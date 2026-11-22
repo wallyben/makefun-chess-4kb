@@ -3,7 +3,7 @@
 Status: ACTIVE. Deadline: 2026-11-24 17:00 UTC. Submission target: 2026-11-24 12:00 UTC. Feature freeze: 2026-11-23 17:00 UTC.
 
 ## Single objective
-Deliver the strongest **officially scored, eligible, accepted** Tiny Chess entry. Passing CI, winning small Stockfish samples, and implementing new features are NOT success criteria.
+Deliver a **verified eligible, accepted Tiny Chess entry scoring at least 2000 Elo**. This is a hard user-defined acceptance gate, not an outcome we can promise. Passing CI, winning small Stockfish samples, and implementing new features are NOT success criteria.
 
 ## Strict sequential gates (never skip)
 G0. Reproduce the official make.fun kit/scorer and confirm exact protocol, constraints, submission process.
@@ -50,3 +50,6 @@ PROVEN (2026-11-22 17:13 UTC): Single passed-pawn evaluation derivative at workf
 - PROVEN: Current branch generates challenger main.py only inside Actions runner; it is not a persisted release main.py. A passing CI run is not a submitted entry.
 - UNKNOWN: authentic coding-agent transcripts meeting official >=30% counted-line coverage, one authored entrypoint line, timestamp consistency; release repository snapshot, original authorship attribution, official hosted acceptance. Do not fabricate transcripts or assert these gates passed.
 - NEXT ACTION (G6): inspect genuine existing transcripts and release eligibility, then package the strongest *eligible* derivative and test exact snapshot. Do not begin another evaluation tweak until release blocker is cleared. Protect submission-minimal commit ca334ddbb43253ba84db40dbd09817be5779c39e. Stop optional features at 2026-11-23 17:00 UTC.
+
+## User hard acceptance criterion (2026-11-22)
+The user explicitly requires **verified eligible submission >=2000 Elo; no compromises**. Do not submit a weaker candidate as satisfying this request, claim local-kit score is hosted verification, or claim eligibility without genuine transcript coverage and licence compliance. No candidate has yet demonstrated 2000 Elo in the official kit: highest observed is the unmodified 1654-Elo upstream reference, which is not our eligible submitted entry. All derivatives observed weaker. The immediate blocker is **strength plus eligibility**. To reach the target, find a materially stronger eligible architecture or licensed engine with verifiable attribution and substantive agent-authored improvements, then perform official scorer verification and authentic transcript audit before submission. A hard target is not permission to falsify results or bypass gates. Deadline 2026-11-24 17:00 UTC.
