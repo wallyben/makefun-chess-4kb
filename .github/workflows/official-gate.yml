@@ -1,0 +1,55 @@
+name: Official competition gate G0
+on:
+  push:
+    branches: [experiment/public-engine-reproduction-20261122]
+    paths: ['.github/workflows/official-gate.yml']
+  workflow_dispatch:
+jobs:
+  official-kit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and audit actual official kit
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fLsS --retry 3 https://make.fun/c/tiny-chess-01/kit -o /tmp/official-kit.tar.gz
+          mkdir -p /tmp/official-kit
+          tar -xzf /tmp/official-kit.tar.gz -C /tmp/official-kit
+          find /tmp/official-kit -type f | sort > official-kit-files.txt
+          K=/tmp/official-kit/tiny-chess-01-kit
+          for f in RULES.txt kit.json program/scorer/score.mjs program/generator/calibration.json program/env/server.mjs; do
+            test -f "$K/$f"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          k=Path('/tmp/official-kit/tiny-chess-01-kit')
+          for f in ['RULES.txt','kit.json','program/scorer/score.mjs','program/generator/calibration.json','program/env/server.mjs']:
+            s=(k/f).read_text()
+            print('===',f,'bytes',len(s.encode()),'===')
+            if len(s)<18000: print(s)
+            else:
+              for i,line in enumerate(s.splitlines(),1):
+                if re.search('elo|sunfish|house|opening|gauntlet|node|seed|score|move|deadline|time|transcript|http|port|practice',line,re.I): print(i,line[:230])
+          print('=== RELEVANT KIT FILES ===')
+          for f in Path('official-kit-files.txt').read_text().splitlines():
+            if re.search('readme|practice|trial|harness|main.py|script|package.json|run|submit|score',f,re.I):print(f)
+          PY
+          cp "$K/RULES.txt" official-RULES.txt
+          cp "$K/kit.json" official-kit.json
+          cp "$K/program/scorer/score.mjs" official-score.mjs
+          cp "$K/program/env/server.mjs" official-server.mjs
+          cp "$K/program/generator/calibration.json" official-calibration.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-g0-evidence
+          path: |
+            official-kit-files.txt
+            official-RULES.txt
+            official-kit.json
+            official-score.mjs
+            official-server.mjs
+            official-calibration.json
