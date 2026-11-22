@@ -41,11 +41,7 @@ jobs:
           assert source.count(anchor)==1
           # One established endgame evaluation improvement: reward genuinely passed pawns.
           # Mailbox board uses own white pawns moving towards decreasing indices.
-          passed_eval="""  b=o[0]
-  for i in range(21,99):
-   if b[i]=='P' and not any(b[j]=='p' for j in range(21,99) if j<i and abs(j%10-i%10)<=1):s+=min(65,(9-i//10)*10)
-   if b[i]=='p' and not any(b[j]=='P' for j in range(21,99) if j>i and abs(j%10-i%10)<=1):s-=min(65,(i//10-1)*10)
-"""
+          passed_eval='  b=o[0]\\n  for i in range(21,99):\\n   if b[i]==\'P\' and not any(b[j]==\'p\' for j in range(21,99) if j<i and abs(j%10-i%10)<=1):s+=min(65,(9-i//10)*10)\\n   if b[i]==\'p\' and not any(b[j]==\'P\' for j in range(21,99) if j>i and abs(j%10-i%10)<=1):s-=min(65,(i//10-1)*10)\\n'
           modified=source.replace(anchor,passed_eval+anchor)
           assert modified!=source
           # Exercise core rules on known positions before running the gauntlet.
