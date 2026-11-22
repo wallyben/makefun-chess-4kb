@@ -17,8 +17,9 @@ jobs:
           python - <<'PY'
           import ast,lzma,pathlib,hashlib
           p=pathlib.Path('/tmp/main.py')
-          src=p.read_text()
+          src=p.read_bytes().decode('latin-1')
           print('PUBLIC_SOURCE_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          print('RAW_PREFIX',repr(p.read_bytes()[:180]))
           tree=ast.parse(src)
           for node in ast.walk(tree):
            if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr=='decompress':
