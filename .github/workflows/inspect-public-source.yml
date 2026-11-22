@@ -25,7 +25,7 @@ jobs:
           for node in ast.walk(tree):
            if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute) and node.func.attr=='decompress':
             for arg in node.args:
-   print('DECOMPRESS_ARG',ast.dump(arg,include_attributes=False)[:400])
+             print('DECOMPRESS_ARG',ast.dump(arg,include_attributes=False)[:400])
              try:
               v=ast.literal_eval(arg)
               if isinstance(v,str):v=v.encode('latin-1')
